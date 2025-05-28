@@ -6,7 +6,7 @@
 
     <groupId>com.poker</groupId>
     <artifactId>poker</artifactId>
-    <version>1.0</version>
+    <version>1.0-beta</version>
     <packaging>jar</packaging>
 
     <name>Poker</name>
@@ -22,7 +22,7 @@
         <repository>
             <id>github</id>
             <name>Github Sudo-Vire Apache Maven Packages</name>
-            <url>http://maven.pkg.github.com/Sudo-Vire/Poker</url>
+            <url>https://maven.pkg.github.com/Sudo-Vire/Poker</url>
         </repository>
     </distributionManagement>
 

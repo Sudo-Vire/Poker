@@ -1,3 +1,5 @@
+package poker;
+
 import java.util.Scanner;
 
 public class Interfaz {
