@@ -1,9 +1,7 @@
-package poker;
-
 import java.util.Scanner;
 
 public class Interfaz {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static int leerNumero(String mensaje, int min, int max) {
         int numero;
@@ -23,12 +21,6 @@ public class Interfaz {
 
     public static String leerLinea() {
         return scanner.nextLine();
-    }
-
-    public static void limpiarPantalla() {
-        for (int i = 0; i < 10; i++) {
-            System.out.println();
-        }
     }
 
     public static void mostrarMensaje(String mensaje) {

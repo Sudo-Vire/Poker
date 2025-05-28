@@ -1,23 +1,17 @@
-package poker;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Jugador {
     private final String nombre;
-    private List<Baraja.Carta> mano;
+    private final List<Baraja.Carta> mano;
     private int saldo;
-    private boolean puedeApostar;
     private boolean enJuego;
-    private boolean haSubido;
 
     public Jugador(String nombre, int saldoInicial) {
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.setSaldo(saldoInicial);
-        this.puedeApostar = true;
         this.enJuego = true;
-        this.haSubido = false;
     }
     
     public void recibirCarta(Baraja.Carta carta) {
@@ -35,18 +29,9 @@ public class Jugador {
         }
         Interfaz.mostrarMensaje(manoEnLinea.toString());
     }
-    
-    public boolean getPuedeApostar() {
-        return puedeApostar;
-    }
-    
-    public void setPuedeApostar(boolean puedeApostar) {
-        this.puedeApostar = puedeApostar;
-    }
-    
+
     public void retirarse() {
         enJuego = false;
-        puedeApostar = false;
     }
     
     public void ganar(int cantidad) {
@@ -55,9 +40,7 @@ public class Jugador {
     
     public void nuevaMano() {
         mano.clear();
-        puedeApostar = true;
         enJuego = true;
-        haSubido = false;
     }
 
     public int getSaldo() {
@@ -79,14 +62,6 @@ public class Jugador {
         return enJuego;
     }
 
-    public boolean isHaSubido() {
-        return haSubido;
-    }
-
-    public void setHaSubido(boolean haSubido) {
-        this.haSubido = haSubido;
-    }
-    
     public List<Baraja.Carta> getMano() {
         return new ArrayList<>(mano);
     }

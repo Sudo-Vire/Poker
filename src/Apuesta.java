@@ -1,11 +1,9 @@
-package poker;
-
 import java.util.List;
 
 public class Apuesta {
     private int smallBlind;
     private int bigBlind;
-    private int manosParaAumentarCiegas;
+    private final int manosParaAumentarCiegas;
     private int contadorManos;
 
     public Apuesta(int smallBlind, int bigBlind, int manosParaAumentarCiegas) {
@@ -27,13 +25,12 @@ public class Apuesta {
         }
     }
 
-    public boolean realizarApuesta(Jugador jugador, int cantidad, int[] pozo) {
+    public void realizarApuesta(Jugador jugador, int cantidad, int[] pozo) {
         if (cantidad > jugador.getSaldo()) {
             throw new IllegalArgumentException(jugador.getNombre() + " no tiene suficientes fichas para apostar " + cantidad);
         }
         jugador.setSaldo(jugador.getSaldo() - cantidad);
         pozo[0] += cantidad;
-        return true;
     }
 
     public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase) {
@@ -63,8 +60,7 @@ public class Apuesta {
         for (Baraja.Carta carta : comunitarias) {
             mensaje.append(carta).append(" | ");
         }
-        // Eliminamos el último " | " del StringBuilder
-        if (comunitarias.size() > 0) {
+        if (!comunitarias.isEmpty()) {
             mensaje.setLength(mensaje.length() - 3);
         }
         Interfaz.mostrarMensaje(mensaje.toString());

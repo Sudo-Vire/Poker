@@ -1,5 +1,3 @@
-package poker;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,14 +50,14 @@ public class EvaluarManos {
             for (int i = inicio; i <= cartas.size() - longitud; i++) {
                 actual.add(cartas.get(i));
                 generarCombinacionesRecursivo(cartas, actual, combinaciones, i + 1, longitud - 1);
-                actual.remove(actual.size() - 1);
+                actual.removeLast();
             }
         }
     }
     
     public static String evaluarCombinacion(List<Baraja.Carta> combinacion) {
         // Ordenar las cartas de mayor a menor valor
-        Collections.sort(combinacion, Collections.reverseOrder());
+        combinacion.sort(Collections.reverseOrder());
         
         // Aquí se implementarían los checks para cada tipo de mano de poker
         // Por simplicidad, solo se implementan algunos ejemplos
@@ -74,12 +72,12 @@ public class EvaluarManos {
         if (esDoblePareja(combinacion)) return "Doble Pareja";
         if (esPareja(combinacion)) return "Pareja";
         
-        return "Carta Alta: " + combinacion.get(0).valor;
+        return "Carta Alta: " + combinacion.getFirst().valor;
     }
     
     private static boolean esEscaleraReal(List<Baraja.Carta> combinacion) {
         // Implementación simplificada
-        return esEscaleraColor(combinacion) && combinacion.get(0).valor.equals("A");
+        return esEscaleraColor(combinacion) && combinacion.getFirst().valor.equals("A");
     }
     
     private static boolean esEscaleraColor(List<Baraja.Carta> combinacion) {
@@ -99,7 +97,7 @@ public class EvaluarManos {
     
     private static boolean esColor(List<Baraja.Carta> combinacion) {
         // Implementación simplificada
-        String palo = combinacion.get(0).palo;
+        String palo = combinacion.getFirst().palo;
         for (Baraja.Carta carta : combinacion) {
             if (!carta.palo.equals(palo)) {
                 return false;
@@ -153,25 +151,25 @@ public class EvaluarManos {
     
     public static int obtenerValorMano(String mano) {
         // Asignamos valores arbitrarios a cada tipo de mano para comparación
-        switch (mano) {
-            case "Escalera Real": return 10;
-            case "Escalera de Color": return 9;
-            case "Póker": return 8;
-            case "Full House": return 7;
-            case "Color": return 6;
-            case "Escalera": return 5;
-            case "Trío": return 4;
-            case "Doble Pareja": return 3;
-            case "Pareja": return 2;
-            default: return 1; // Carta Alta
-        }
+        return switch (mano) {
+            case "Escalera Real" -> 10;
+            case "Escalera de Color" -> 9;
+            case "Póker" -> 8;
+            case "Full House" -> 7;
+            case "Color" -> 6;
+            case "Escalera" -> 5;
+            case "Trío" -> 4;
+            case "Doble Pareja" -> 3;
+            case "Pareja" -> 2;
+            default -> 1;
+        };
     }
     
     private static String obtenerKicker(List<Baraja.Carta> combinacion, String mano) {
         // Solo aplicamos el kicker para ciertas manos
         if (mano.startsWith("Pareja") || mano.startsWith("Trío") || mano.startsWith("Doble Pareja")) {
             List<Baraja.Carta> kickers = new ArrayList<>();
-            // Extraemos los valores de las cartas que forman la mano principal
+
             String[] partes = mano.split(" ");
             List<String> valoresPrincipales = new ArrayList<>();
             for (String parte : partes) {
@@ -191,9 +189,9 @@ public class EvaluarManos {
             }
             
             // Ordenamos los kickers de mayor a menor
-            Collections.sort(kickers, Collections.reverseOrder());
+            kickers.sort(Collections.reverseOrder());
             // Devolvemos el valor del kicker más alto
-            return kickers.isEmpty() ? "" : kickers.get(0).valor;
+            return kickers.isEmpty() ? "" : kickers.getFirst().valor;
         }
         return "";
     }

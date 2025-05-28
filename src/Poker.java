@@ -1,7 +1,6 @@
-package poker;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Poker {
@@ -124,7 +123,7 @@ public class Poker {
             
             // Mostrar las 5 mejores cartas del jugador en la misma línea
             StringBuilder cartasEnLinea = new StringBuilder("Cartas usadas: ");
-            for (Baraja.Carta carta : mejores5Cartas) {
+            for (Baraja.Carta carta : Objects.requireNonNull(mejores5Cartas)) {
                 cartasEnLinea.append(carta.toString()).append(" ");
             }
             Interfaz.mostrarMensaje(cartasEnLinea.toString());

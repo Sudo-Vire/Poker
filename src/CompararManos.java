@@ -1,5 +1,3 @@
-package poker;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,8 +44,8 @@ public class CompararManos {
         todasCartas2.addAll(cartasComunitarias);
         
         // Ordenamos las cartas de mayor a menor según su valor numérico
-        Collections.sort(todasCartas1, Collections.reverseOrder());
-        Collections.sort(todasCartas2, Collections.reverseOrder());
+        todasCartas1.sort(Collections.reverseOrder());
+        todasCartas2.sort(Collections.reverseOrder());
         
         List<Integer> valoresMano1;
         List<Integer> valoresMano2;
@@ -145,12 +143,12 @@ public class CompararManos {
         }
         
         // Ordenamos los kickers de mayor a menor
-        Collections.sort(kickers, Collections.reverseOrder());
+        kickers.sort(Collections.reverseOrder());
         
         // Solo nos quedamos con el mejor kicker
         if (!kickers.isEmpty()) {
             List<Integer> mejorKicker = new ArrayList<>();
-            mejorKicker.add(kickers.get(0));
+            mejorKicker.add(kickers.getFirst());
             return mejorKicker;
         }
         
