@@ -1,4 +1,4 @@
-#♠️ Poker en Java
+♠️ Poker en Java
 Este proyecto es una implementación del juego de póker (Texas Hold'em) desarrollada en Java. Está diseñado para ofrecer una experiencia de juego sencilla y educativa, ideal para quienes desean aprender sobre lógica de juegos y programación orientada a objetos.
 
 ---
@@ -10,7 +10,7 @@ Interfaz por línea de comandos.
 
 ---
 
-##📁 Estructura del Proyecto
+📁 Estructura del Proyecto
 
 Poker/
 ├── .idea/ 
@@ -31,7 +31,8 @@ Poker/
 │       └── Poker.java
 ├── .gitignore    
 ├── Poker.iml       
-├── README.md
+└── README.md
+
 ---
 
 📄 Licencia
