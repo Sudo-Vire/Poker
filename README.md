@@ -12,8 +12,8 @@ Interfaz por línea de comandos.
 
 📁 Estructura del Proyecto
 
-Poker/
-├── .idea/ 
+- **Poker/
+- ***.idea/ 
 │   ├── dictionaries
 │   │   └── project.xml
 │   ├── .gitignore 
