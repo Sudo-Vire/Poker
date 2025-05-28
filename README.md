@@ -3,7 +3,7 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 
 ---
 
-##🎯 Características
+🎯 Características
 Simulación de partidas de Texas Hold'em para múltiples jugadores.
 Lógica completa del juego: reparto de cartas, rondas de apuestas y determinación del ganador.
 Interfaz por línea de comandos.
