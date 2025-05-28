@@ -11,9 +11,9 @@ Interfaz por línea de comandos.
 ---
 
 📁 Estructura del Proyecto
-
-- Poker/
--- .idea/ 
+<pre>
+├── Poker/
+│   ├──.idea/ 
 │   ├── dictionaries
 │   │   └── project.xml
 │   ├── .gitignore 
@@ -32,6 +32,7 @@ Interfaz por línea de comandos.
 ├── .gitignore    
 ├── Poker.iml       
 └── README.md
+</pre>
 
 ---
 
