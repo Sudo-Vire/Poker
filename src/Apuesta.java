@@ -74,10 +74,6 @@ public class Apuesta {
         return bigBlind;
     }
 
-    public void setContadorManos(int contadorManos) {
-        this.contadorManos = contadorManos;
-    }
-    
     public void mostrarCiegasActuales() {
         Interfaz.mostrarMensaje("Ciega pequeña actual: " + smallBlind + ", Ciega grande actual: " + bigBlind);
     }
