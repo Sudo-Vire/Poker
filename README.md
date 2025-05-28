@@ -44,7 +44,7 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 ## 🚀 Cómo ejecutar
 
 1. Clona el repositorio:
-   git clone git clone https://github.com/Sudo-Vire/Poker.git
+   "git clone git clone https://github.com/Sudo-Vire/Poker.git"
 
 2. Abre el proyecto en tu IDE favorito (Este repo se ha desarrollado originalmente en IntelliJ).
 
