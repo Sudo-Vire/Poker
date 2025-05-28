@@ -155,16 +155,7 @@ public class EvaluarManos {
         if (mano.startsWith("Pareja") || mano.startsWith("Trío") || mano.startsWith("Doble Pareja")) {
             List<Baraja.Carta> kickers = new ArrayList<>();
 
-            String[] partes = mano.split(" ");
-            List<String> valoresPrincipales = new ArrayList<>();
-            for (String parte : partes) {
-                if (!parte.equals("de") && !parte.equals("Carta") && !parte.equals("Alta:") &&
-                        !parte.equals("Pareja") && !parte.equals("Trío") && !parte.equals("Doble") &&
-                        !parte.equals("Full") && !parte.equals("House") && !parte.equals("Póker") &&
-                        !parte.equals("Color") && !parte.equals("Escalera") && !parte.equals("con") && !parte.equals("kicker")) {
-                    valoresPrincipales.add(parte);
-                }
-            }
+            List<String> valoresPrincipales = getStrings(mano);
 
             for (Baraja.Carta carta : combinacion) {
                 if (!valoresPrincipales.contains(carta.valor)) {
@@ -176,5 +167,19 @@ public class EvaluarManos {
             return kickers.isEmpty() ? "" : kickers.get(0).valor;
         }
         return "";
+    }
+
+    private static List<String> getStrings(String mano) {
+        String[] partes = mano.split(" ");
+        List<String> valoresPrincipales = new ArrayList<>();
+        for (String parte : partes) {
+            if (!parte.equals("de") && !parte.equals("Carta") && !parte.equals("Alta:") &&
+                    !parte.equals("Pareja") && !parte.equals("Trío") && !parte.equals("Doble") &&
+                    !parte.equals("Full") && !parte.equals("House") && !parte.equals("Póker") &&
+                    !parte.equals("Color") && !parte.equals("Escalera") && !parte.equals("con") && !parte.equals("kicker")) {
+                valoresPrincipales.add(parte);
+            }
+        }
+        return valoresPrincipales;
     }
 }
