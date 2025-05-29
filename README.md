@@ -51,10 +51,10 @@ Poker/
 │   ├── generated-sources/
 │   ├── maven-archiver/
 │   ├── maven-status/
-│   └── poker-1.0-beta.jar       # Archivo ejecutable generado
+│   └── poker-1.0-beta.jar       
 ├── .gitignore
 ├── Poker.iml
-├── pom.xml                      # Archivo de configuración de Maven
+├── pom.xml                    
 ├── README.md
 </pre>
 
