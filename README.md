@@ -13,49 +13,14 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 ## 📁 Estructura del Proyecto
 <pre>
 Poker/
-├── .idea/                       # Archivos de configuración de IntelliJ IDEA
-├── out/                         # Archivos compilados por IntelliJ
-│   └── production/
-│       └── main
-│           └── Poker/
-│               ├── Apuesta.class
-│               ├── Baraja/
-│               │   └── Carta.class
-│               ├── CompararManos.class
-│               ├── EvaluarManos.class
-│               ├── Interfaz.class
-│               ├── Jugador.class
-│               └── Poker.class
-├── src/                         # Código fuente del programa
-│   └── java/
-│       └── poker/
-│           ├── Apuesta.java
-│           ├── Baraja/
-│           │   └── Carta.java
-│           ├── CompararManos.java
-│           ├── EvaluarManos.java
-│           ├── Interfaz.java
-│           ├── Jugador.java
-│           └── Poker.java
-├── target/                      # Archivos construidos por Maven
-│   ├── classes/
-│   │   └── poker/
-│   │       ├── Apuesta.class
-│   │       ├── Baraja/
-│   │       │   └── Carta.class
-│   │       ├── CompararManos.class
-│   │       ├── EvaluarManos.class
-│   │       ├── Interfaz.class
-│   │       ├── Jugador.class
-│   │       └── Poker.class
-│   ├── generated-sources/
-│   ├── maven-archiver/
-│   ├── maven-status/
-│   └── poker-1.0-beta.jar       
-├── .gitignore
-├── Poker.iml
-├── pom.xml                    
-├── README.md
+    ├── .idea/                       # Archivos de configuración de IntelliJ IDEA
+    ├── out/                         # Archivos compilados por IntelliJ
+    ├── src/                         # Código fuente del programa
+    ├── target/                      # Archivos construidos por Maven y ejecutable del programa
+    ├── .gitignore
+    ├── Poker.iml
+    ├── pom.xml                    
+    ├── README.md
 </pre>
 
 ---
