@@ -13,25 +13,49 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 ## 📁 Estructura del Proyecto
 <pre>
 Poker/
-├──.idea/ 
-│   ├── dictionaries
-│   │   └── project.xml
-│   ├── .gitignore 
-│   ├── misc.xml
-│   ├── modules.xml
-│   └── vcs.xml
-├── src/
-│   └── poker/
-│       ├── Apuesta.java
-│       ├── Baraja.java
-│       ├── CompararManos.java
-│       ├── EvaluarManos.java
-│       ├── Interfaz.java
-│       ├── Jugador.java
-│       └── Poker.java
-├── .gitignore    
-├── Poker.iml       
-└── README.md
+├── .idea/                       # Archivos de configuración de IntelliJ IDEA
+├── out/                         # Archivos compilados por IntelliJ
+│   └── production/
+│       └── Poker/
+│           ├── Apuesta.class
+│           ├── Baraja/
+│           │   └── Carta.class
+│           ├── CompararManos.class
+│           ├── EvaluarManos.class
+│           ├── Interfaz.class
+│           ├── Jugador.class
+│           └── Poker.class
+├── src/                         # Código fuente del programa
+│   └── java/
+│       └── poker/
+│           ├── Apuesta.java
+│           ├── Baraja/
+│           │   └── Carta.java
+│           ├── CompararManos.java
+│           ├── EvaluarManos.java
+│           ├── Interfaz.java
+│           ├── Jugador.java
+│           └── Poker.java
+├── target/                      # Archivos construidos por Maven
+│   ├── classes/
+│   │   └── poker/
+│   │       ├── Apuesta.class
+│   │       ├── Baraja/
+│   │       │   └── Carta.class
+│   │       │   └── ...
+│   │       ├── CompararManos.class
+│   │       ├── EvaluarManos.class
+│   │       ├── Interfaz.class
+│   │       ├── Jugador.class
+│   │       └── Poker.class
+│   ├── generated-sources/
+│   ├── maven-archiver/
+│   ├── maven-status/
+│   └── poker-1.0-beta.jar       # Archivo ejecutable generado
+├── .gitignore
+├── Poker.iml
+├── pom.xml                      # Archivo de configuración de Maven
+├── README.md
 </pre>
 
 ---
