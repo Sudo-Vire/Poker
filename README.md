@@ -20,7 +20,7 @@ Poker/
     ├── .gitignore
     ├── Poker.iml
     ├── pom.xml                    
-    ├── README.md
+    └── Poker/README.md
 </pre>
 
 ---
