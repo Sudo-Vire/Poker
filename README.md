@@ -16,15 +16,16 @@ Poker/
 ├── .idea/                       # Archivos de configuración de IntelliJ IDEA
 ├── out/                         # Archivos compilados por IntelliJ
 │   └── production/
-│       └── Poker/
-│           ├── Apuesta.class
-│           ├── Baraja/
-│           │   └── Carta.class
-│           ├── CompararManos.class
-│           ├── EvaluarManos.class
-│           ├── Interfaz.class
-│           ├── Jugador.class
-│           └── Poker.class
+│       └── main
+│           └── Poker/
+│               ├── Apuesta.class
+│               ├── Baraja/
+│               │   └── Carta.class
+│               ├── CompararManos.class
+│               ├── EvaluarManos.class
+│               ├── Interfaz.class
+│               ├── Jugador.class
+│               └── Poker.class
 ├── src/                         # Código fuente del programa
 │   └── java/
 │       └── poker/
@@ -42,7 +43,6 @@ Poker/
 │   │       ├── Apuesta.class
 │   │       ├── Baraja/
 │   │       │   └── Carta.class
-│   │       │   └── ...
 │   │       ├── CompararManos.class
 │   │       ├── EvaluarManos.class
 │   │       ├── Interfaz.class
