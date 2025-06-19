@@ -9,10 +9,10 @@ public class Poker {
         Scanner scanner = new Scanner(System.in);
         Interfaz.mostrarMensaje("Bienvenido al juego de Poker Texas Hold'em!");
 
-        // Configuración inicial del juego con valores personalizados
-        int smallBlind = 10; 
-        int bigBlind = 20; 
-        int manosParaAumentarCiegas = 4; 
+        // Configuración inicial del juego
+        int smallBlind = 10;
+        int bigBlind = 20;
+        int manosParaAumentarCiegas = 4;
         Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas);
         Baraja baraja = new Baraja();
         List<Jugador> jugadores = new ArrayList<>();
@@ -20,12 +20,10 @@ public class Poker {
         int numJugadores = Interfaz.leerNumero("¿Cuántos jugadores van a jugar? (2-10): ", 2, 10);
         for (int i = 0; i < numJugadores; i++) {
             int numJugador = i + 1;
-            Interfaz.mostrarMensaje("Jugador " + (i + 1) + ", introduce tu nombre");
+            Interfaz.mostrarMensaje("Jugador " + numJugador + ", introduce tu nombre");
             String nombre = Interfaz.leerLinea();
-            // El saldo inicial es fijo en 1000
             int saldoInicial = 1000;
-            boolean haApostado = false;
-            jugadores.add(new Jugador(numJugador, nombre, saldoInicial, haApostado));
+            jugadores.add(new Jugador(numJugador, nombre, saldoInicial));
         }
 
         // Bucle principal del juego
@@ -34,7 +32,6 @@ public class Poker {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
             jugarMano(jugadores, baraja, apuesta);
-            // Preguntar si quieren jugar otra mano
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
             if (!respuesta.equalsIgnoreCase("s")) {
@@ -61,30 +58,22 @@ public class Poker {
             jugador.nuevaMano();
             jugador.recibirCarta(baraja.repartirCarta());
             jugador.recibirCarta(baraja.repartirCarta());
-            // Limpiar el terminal
             for (int i = 0; i < 10; i++) {
                 Interfaz.mostrarMensaje("");
             }
         }
 
-        // Ronda de apuestas pre-flop
+        // Rondas de apuestas y fases de juego
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop");
-
-        // Flop
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
         }
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop");
-
-        // Turn
         comunitarias.add(baraja.repartirCarta());
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn");
-
-        // River
         comunitarias.add(baraja.repartirCarta());
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River");
 
-        // Showdown
         showdown(jugadores, comunitarias, pozo);
     }
 
@@ -94,9 +83,7 @@ public class Poker {
 
         List<Jugador> jugadoresEnJuego = new ArrayList<>();
         for (Jugador jugador : jugadores) {
-            if (jugador.isEnJuego()) {
-                jugadoresEnJuego.add(jugador);
-            }
+            if (jugador.isEnJuego()) jugadoresEnJuego.add(jugador);
         }
 
         // Evaluar y mostrar las manos de los jugadores en juego
@@ -121,7 +108,6 @@ public class Poker {
             }
         }
 
-
         // Determinar si hay un ganador o un empate
         if (ganador != null) {
             boolean empate = false;
@@ -137,12 +123,11 @@ public class Poker {
 
             if (empate) {
                 Interfaz.mostrarMensaje("Empate. Las fichas del pozo se devuelven a los jugadores.");
-                // Devolver las fichas apostadas a cada jugador en juego
                 int fichasPorJugador = pozo[0] / jugadoresEnJuego.size();
                 for (Jugador jugador : jugadoresEnJuego) {
                     jugador.ganar(fichasPorJugador);
                 }
-                pozo[0] = 0; // Reiniciar el pozo
+                pozo[0] = 0;
             } else {
                 Interfaz.mostrarMensaje(ganador.getNombre() + " gana con " + mejorMano + " y se lleva " + pozo[0] + " fichas.");
                 ganador.ganar(pozo[0]);

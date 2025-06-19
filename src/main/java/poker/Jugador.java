@@ -3,23 +3,26 @@ package poker;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase que representa un jugador de Poker.
+ */
 public class Jugador {
-    static int numJugador = 0;
+    private final int numJugador;
     private final String nombre;
     private final List<Baraja.Carta> mano;
     private int saldo;
     boolean enJuego;
-    public static boolean haApostado;
+    private boolean haApostado; // <--- Estado individual de apuesta en la ronda
 
-    public Jugador(int numJugador, String nombre, int saldoInicial, boolean haApostado) {
-        Jugador.numJugador = numJugador;
+    public Jugador(int numJugador, String nombre, int saldoInicial) {
+        this.numJugador = numJugador;
         this.nombre = nombre;
         this.mano = new ArrayList<>();
-        this.setSaldo(saldoInicial);
+        this.saldo = saldoInicial;
         this.enJuego = true;
-        Jugador.haApostado = haApostado;
+        this.haApostado = false;
     }
-    
+
     public void recibirCarta(Baraja.Carta carta) {
         if (carta != null) {
             mano.add(carta);
@@ -28,7 +31,7 @@ public class Jugador {
         }
     }
 
-    //muestra la mano cada ronda
+    // Muestra la mano del jugador
     public void mostrarMano() {
         StringBuilder manoEnLinea = new StringBuilder(nombre + " tiene: ");
         for (Baraja.Carta carta : mano) {
@@ -36,36 +39,27 @@ public class Jugador {
         }
         Interfaz.mostrarMensaje(manoEnLinea.toString());
     }
-    
+
     public void ganar(int cantidad) {
         saldo += cantidad;
     }
-    
+
+    // Prepara al jugador para una nueva mano
     public void nuevaMano() {
         mano.clear();
         enJuego = true;
+        haApostado = false;
     }
 
-    public int getSaldo() {
-        return saldo;
-    }
-
+    // Getters y setters
+    public int getSaldo() { return saldo; }
     public void setSaldo(int saldo) {
-        if (saldo < 0) {
-            throw new IllegalArgumentException("El saldo no puede ser negativo");
-        }
+        if (saldo < 0) throw new IllegalArgumentException("El saldo no puede ser negativo");
         this.saldo = saldo;
     }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public boolean isEnJuego() {
-        return enJuego;
-    }
-
-    public List<Baraja.Carta> getMano() {
-        return new ArrayList<>(mano);
-    }
+    public String getNombre() { return nombre; }
+    public boolean isEnJuego() { return enJuego; }
+    public List<Baraja.Carta> getMano() { return new ArrayList<>(mano); }
+    public boolean isHaApostado() { return haApostado; }
+    public void setHaApostado(boolean haApostado) { this.haApostado = haApostado; }
 }

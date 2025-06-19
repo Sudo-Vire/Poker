@@ -5,7 +5,7 @@ import java.util.List;
 public class Apuesta {
     private int smallBlind;
     private int bigBlind;
-    private final int manosParaAumentarCiegas;
+    private final int manosParaAumentarCiegas = 3;
     private int contadorManos;
 
     public Apuesta(int smallBlind, int bigBlind, int manosParaAumentarCiegas) {
@@ -14,11 +14,10 @@ public class Apuesta {
         }
         this.smallBlind = smallBlind;
         this.bigBlind = bigBlind;
-        this.manosParaAumentarCiegas = manosParaAumentarCiegas;
         this.contadorManos = 0;
     }
 
-    //Aumenta las ciegas
+    // Aumenta las ciegas cada cierto número de manos jugadas
     public void aumentarCiegas() {
         contadorManos++;
         if (contadorManos % manosParaAumentarCiegas == 0) {
@@ -29,16 +28,20 @@ public class Apuesta {
     }
 
     public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase) {
+        // Reiniciar haApostado para todos los jugadores activos
         for (Jugador jugador : jugadores) {
-            Jugador.haApostado = false;
+            if (jugador.isEnJuego()) jugador.setHaApostado(false);
+        }
+
+        for (int i = 0; i < jugadores.size(); i++) {
+            Jugador jugador = jugadores.get(i);
             if (jugador.isEnJuego()) {
-                // Mostrar las cartas comunitarias antes de que el jugador realice su acción
                 mostrarCartasComunitarias(comunitarias, fase);
-                // Mostrar la mano del jugador
                 jugador.mostrarMano();
-                // Mostrar las fichas del jugador
                 Interfaz.mostrarMensaje(jugador.getNombre() + " tiene " + jugador.getSaldo() + " fichas.");
-                int numJugada = Interfaz.opcionesJugada(jugadores);
+                int numJugada = Interfaz.opcionesJugada(jugadores, i);
+
+                // Validación de jugada y ciclo de apuestas
                 if (numJugada == 1) {
                     label:
                     while (true) {
@@ -76,11 +79,8 @@ public class Apuesta {
                 } else {
                     throw new IllegalArgumentException("No es una opción válida");
                 }
-
-
-
-
-                for (int i = 0; i < 20; i++) {
+                // Limpiar pantalla
+                for (int k = 0; k < 20; k++) {
                     Interfaz.mostrarMensaje("");
                 }
             }
@@ -92,7 +92,7 @@ public class Apuesta {
             throw new IllegalArgumentException(jugador.getNombre() + " no tiene suficientes fichas para apostar " + cantidad);
         }
         jugador.setSaldo(jugador.getSaldo() - cantidad);
-        Jugador.haApostado = true;
+        jugador.setHaApostado(cantidad > 0); // Solo marca como que apostó si la cantidad es mayor a 0
         pozo[0] += cantidad;
     }
 
