@@ -12,12 +12,12 @@ public class Jugador {
     public static boolean haApostado;
 
     public Jugador(int numJugador, String nombre, int saldoInicial, boolean haApostado) {
-        this.numJugador = numJugador;
+        Jugador.numJugador = numJugador;
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.setSaldo(saldoInicial);
         this.enJuego = true;
-        this.haApostado = haApostado;
+        Jugador.haApostado = haApostado;
     }
     
     public void recibirCarta(Baraja.Carta carta) {
