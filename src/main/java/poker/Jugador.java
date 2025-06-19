@@ -11,7 +11,7 @@ public class Jugador {
     private final List<Baraja.Carta> mano;
     private int saldo;
     boolean enJuego;
-    private boolean haApostado; // <--- Estado individual de apuesta en la ronda
+    private boolean haApostado;
 
     public Jugador(String nombre, int saldoInicial) {
         this.nombre = nombre;

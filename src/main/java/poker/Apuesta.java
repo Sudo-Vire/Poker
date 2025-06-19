@@ -92,7 +92,7 @@ public class Apuesta {
             throw new IllegalArgumentException(jugador.getNombre() + " no tiene suficientes fichas para apostar " + cantidad);
         }
         jugador.setSaldo(jugador.getSaldo() - cantidad);
-        jugador.setHaApostado(cantidad > 0); // Solo marca como que apostó si la cantidad es mayor a 0
+        jugador.setHaApostado(cantidad > 0); // Solo marca como que apostó si la cantidad es mayor que 0
         pozo[0] += cantidad;
     }
 

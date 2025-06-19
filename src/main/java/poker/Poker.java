@@ -12,7 +12,7 @@ public class Poker {
         // Configuración inicial del juego
         int smallBlind = 10;
         int bigBlind = 20;
-        int manosParaAumentarCiegas = 4;
+        int manosParaAumentarCiegas = 3;
         Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas);
         Baraja baraja = new Baraja();
         List<Jugador> jugadores = new ArrayList<>();
