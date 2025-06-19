@@ -157,7 +157,7 @@ public class EvaluarManos {
         return mano.stream().collect(Collectors.groupingBy(c -> c.valorNumerico));
     }
 
-    //Establece un valor a cada mano para la comparación
+    //Establece valor a cada mano para la comparación
     static int obtenerValorMano(String nombre) {
         return switch (nombre) {
             case "Escalera Real" -> 10;
