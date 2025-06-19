@@ -11,7 +11,7 @@ public class Interfaz {
             System.out.print(mensaje);
             while (!scanner.hasNextInt()) {
                 System.out.println("Eso no es un número válido. Inténtalo de nuevo.");
-                scanner.next(); // Descarta la entrada no válida
+                scanner.next(); // Descarta la entrada no váli
                 System.out.print(mensaje);
             }
             numero = scanner.nextInt();
