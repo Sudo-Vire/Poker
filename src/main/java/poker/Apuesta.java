@@ -18,6 +18,7 @@ public class Apuesta {
         this.contadorManos = 0;
     }
 
+    //Aumenta las ciegas
     public void aumentarCiegas() {
         contadorManos++;
         if (contadorManos % manosParaAumentarCiegas == 0) {

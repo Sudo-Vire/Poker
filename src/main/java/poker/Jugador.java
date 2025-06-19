@@ -23,7 +23,8 @@ public class Jugador {
             throw new IllegalArgumentException("La carta no puede ser nula");
         }
     }
-    
+
+    //muestra la mano cada ronda
     public void mostrarMano() {
         StringBuilder manoEnLinea = new StringBuilder(nombre + " tiene: ");
         for (Baraja.Carta carta : mano) {
