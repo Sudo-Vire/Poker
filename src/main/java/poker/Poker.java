@@ -135,5 +135,6 @@ public class Poker {
         } else {
             Interfaz.mostrarMensaje("No hay ganador en esta mano.");
         }
+        Apuesta.aumentarCiegas();
     }
 }
