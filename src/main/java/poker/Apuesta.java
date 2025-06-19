@@ -40,20 +40,23 @@ public class Apuesta {
                 Interfaz.mostrarMensaje(jugador.getNombre() + " tiene " + jugador.getSaldo() + " fichas.");
                 int numJugada = Interfaz.opcionesJugada(jugadores);
                 if (numJugada == 1) {
+                    label:
                     while (true) {
                         String jugada = Interfaz.leerLinea().toLowerCase();
-                        if (jugada.equals("apostar")) {
-                            int apuestaJugador = Interfaz.leerNumero("¿Cuánto quieres apostar?", 1, jugador.getSaldo());
-                            realizarApuesta(jugador, apuestaJugador, pozo);
-                            break;
-                        } else if (jugada.equals("pasar")) {
-                            realizarApuesta(jugador, 0, pozo);
-                            break;
-                        } else if (jugada.equals("retirarse")) {
-                            jugador.enJuego = false;
-                            break;
-                        } else {
-                            System.out.println("Jugada no válida. Escribe 'apostar', 'pasar' o 'retirarse'.");
+                        switch (jugada) {
+                            case "apostar":
+                                int apuestaJugador = Interfaz.leerNumero("¿Cuánto quieres apostar?", 1, jugador.getSaldo());
+                                realizarApuesta(jugador, apuestaJugador, pozo);
+                                break label;
+                            case "pasar":
+                                realizarApuesta(jugador, 0, pozo);
+                                break label;
+                            case "retirarse":
+                                jugador.enJuego = false;
+                                break label;
+                            default:
+                                System.out.println("Jugada no válida. Escribe 'apostar', 'pasar' o 'retirarse'.");
+                                break;
                         }
                     }
                 } else if (numJugada == 2) {
