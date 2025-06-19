@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Jugador {
+    static int numJugador = 0;
     private final String nombre;
     private final List<Baraja.Carta> mano;
     private int saldo;
-    private boolean enJuego;
+    boolean enJuego;
+    public static boolean haApostado;
 
-    public Jugador(String nombre, int saldoInicial) {
+    public Jugador(int numJugador, String nombre, int saldoInicial, boolean haApostado) {
+        this.numJugador = numJugador;
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.setSaldo(saldoInicial);
         this.enJuego = true;
+        this.haApostado = haApostado;
     }
     
     public void recibirCarta(Baraja.Carta carta) {
@@ -31,10 +35,6 @@ public class Jugador {
             manoEnLinea.append(carta.toString()).append(" ");
         }
         Interfaz.mostrarMensaje(manoEnLinea.toString());
-    }
-
-    public void retirarse() {
-        enJuego = false;
     }
     
     public void ganar(int cantidad) {

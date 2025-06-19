@@ -28,16 +28,9 @@ public class Apuesta {
         }
     }
 
-    public void realizarApuesta(Jugador jugador, int cantidad, int[] pozo) {
-        if (cantidad > jugador.getSaldo()) {
-            throw new IllegalArgumentException(jugador.getNombre() + " no tiene suficientes fichas para apostar " + cantidad);
-        }
-        jugador.setSaldo(jugador.getSaldo() - cantidad);
-        pozo[0] += cantidad;
-    }
-
     public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase) {
         for (Jugador jugador : jugadores) {
+            Jugador.haApostado = false;
             if (jugador.isEnJuego()) {
                 // Mostrar las cartas comunitarias antes de que el jugador realice su acción
                 mostrarCartasComunitarias(comunitarias, fase);
@@ -45,17 +38,59 @@ public class Apuesta {
                 jugador.mostrarMano();
                 // Mostrar las fichas del jugador
                 Interfaz.mostrarMensaje(jugador.getNombre() + " tiene " + jugador.getSaldo() + " fichas.");
-                int apuestaJugador = Interfaz.leerNumero("¿Cuánto quieres apostar? (0 para retirarse): ", 0, jugador.getSaldo());
-                if (apuestaJugador == 0) {
-                    jugador.retirarse();
+                int numJugada = Interfaz.opcionesJugada(jugadores);
+                if (numJugada == 1) {
+                    while (true) {
+                        String jugada = Interfaz.leerLinea().toLowerCase();
+                        if (jugada.equals("apostar")) {
+                            int apuestaJugador = Interfaz.leerNumero("¿Cuánto quieres apostar?", 1, jugador.getSaldo());
+                            realizarApuesta(jugador, apuestaJugador, pozo);
+                            break;
+                        } else if (jugada.equals("pasar")) {
+                            realizarApuesta(jugador, 0, pozo);
+                            break;
+                        } else if (jugada.equals("retirarse")) {
+                            jugador.enJuego = false;
+                            break;
+                        } else {
+                            System.out.println("Jugada no válida. Escribe 'apostar', 'pasar' o 'retirarse'.");
+                        }
+                    }
+                } else if (numJugada == 2) {
+                    while (true) {
+                        String jugada = Interfaz.leerLinea().toLowerCase();
+                        if (jugada.equals("apostar")) {
+                            int apuestaJugador = Interfaz.leerNumero("¿Cuánto quieres apostar?", 1, jugador.getSaldo());
+                            realizarApuesta(jugador, apuestaJugador, pozo);
+                            break;
+                        } else if (jugada.equals("retirarse")) {
+                            jugador.enJuego = false;
+                            break;
+                        } else {
+                            System.out.println("Jugada no válida. Escribe 'apostar' o 'retirarse'.");
+                        }
+                    }
                 } else {
-                    realizarApuesta(jugador, apuestaJugador, pozo);
+                    throw new IllegalArgumentException("No es una opción válida");
                 }
+
+
+
+
                 for (int i = 0; i < 20; i++) {
                     Interfaz.mostrarMensaje("");
                 }
             }
         }
+    }
+
+    public void realizarApuesta(Jugador jugador, int cantidad, int[] pozo) {
+        if (cantidad > jugador.getSaldo()) {
+            throw new IllegalArgumentException(jugador.getNombre() + " no tiene suficientes fichas para apostar " + cantidad);
+        }
+        jugador.setSaldo(jugador.getSaldo() - cantidad);
+        Jugador.haApostado = true;
+        pozo[0] += cantidad;
     }
 
     private void mostrarCartasComunitarias(List<Baraja.Carta> comunitarias, String fase) {

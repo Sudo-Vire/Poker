@@ -1,5 +1,6 @@
 package poker;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Interfaz {
@@ -27,6 +28,19 @@ public class Interfaz {
 
     public static void mostrarMensaje(String mensaje) {
         System.out.println(mensaje);
+    }
+
+    public static int opcionesJugada(List<Jugador> jugadores) {
+        System.out.println("¿Qué quieres hacer?");
+        System.out.println("1) Apostar");
+        if (Jugador.numJugador == 1 || !jugadores.get(Jugador.numJugador - 1).haApostado) {
+            System.out.println("2) Pasar");
+            System.out.println("3) Retirarse");
+            return 1;
+        } else {
+            System.out.println("2) Retirarse");
+            return 2;
+        }
     }
 
     public static void cerrarScanner() {

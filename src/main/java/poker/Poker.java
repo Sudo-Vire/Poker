@@ -19,11 +19,13 @@ public class Poker {
 
         int numJugadores = Interfaz.leerNumero("¿Cuántos jugadores van a jugar? (2-10): ", 2, 10);
         for (int i = 0; i < numJugadores; i++) {
+            int numJugador = i + 1;
             Interfaz.mostrarMensaje("Jugador " + (i + 1) + ", introduce tu nombre");
             String nombre = Interfaz.leerLinea();
             // El saldo inicial es fijo en 1000
             int saldoInicial = 1000;
-            jugadores.add(new Jugador(nombre, saldoInicial));
+            boolean haApostado = false;
+            jugadores.add(new Jugador(numJugador, nombre, saldoInicial, haApostado));
         }
 
         // Bucle principal del juego
@@ -32,8 +34,6 @@ public class Poker {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
             jugarMano(jugadores, baraja, apuesta);
-            apuesta.aumentarCiegas();
-
             // Preguntar si quieren jugar otra mano
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
