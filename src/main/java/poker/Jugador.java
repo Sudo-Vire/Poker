@@ -3,9 +3,6 @@ package poker;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Clase que representa un jugador de Poker.
- */
 public class Jugador {
     private final String nombre;
     private final List<Baraja.Carta> mano;
