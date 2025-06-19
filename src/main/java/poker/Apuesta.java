@@ -3,21 +3,21 @@ package poker;
 import java.util.List;
 
 public class Apuesta {
-    private int smallBlind;
-    private int bigBlind;
-    private int contadorManos;
+    private static int smallBlind;
+    private static int bigBlind;
+    private static int contadorManos;
 
     public Apuesta(int smallBlind, int bigBlind, int manosParaAumentarCiegas) {
         if (smallBlind <= 0 || bigBlind <= 0 || manosParaAumentarCiegas <= 0) {
             throw new IllegalArgumentException("Los valores de las ciegas y el número de manos deben ser positivos.");
         }
-        this.smallBlind = smallBlind;
-        this.bigBlind = bigBlind;
-        this.contadorManos = 0;
+        Apuesta.smallBlind = smallBlind;
+        Apuesta.bigBlind = bigBlind;
+        contadorManos = 0;
     }
 
     // Aumenta las ciegas cada cierto número de manos jugadas
-    public void aumentarCiegas() {
+    public static void aumentarCiegas() {
         contadorManos++;
         int manosParaAumentarCiegas = 3;
         if (contadorManos % manosParaAumentarCiegas == 0) {
