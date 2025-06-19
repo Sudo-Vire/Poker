@@ -6,3 +6,4 @@ poker\Interfaz.class
 poker\Jugador.class
 poker\Baraja$Carta.class
 poker\Apuesta.class
+poker\EvaluarManos$ResultadoEvaluacion.class
