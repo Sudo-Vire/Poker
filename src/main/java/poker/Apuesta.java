@@ -5,7 +5,6 @@ import java.util.List;
 public class Apuesta {
     private int smallBlind;
     private int bigBlind;
-    private final int manosParaAumentarCiegas = 3;
     private int contadorManos;
 
     public Apuesta(int smallBlind, int bigBlind, int manosParaAumentarCiegas) {
@@ -20,6 +19,7 @@ public class Apuesta {
     // Aumenta las ciegas cada cierto número de manos jugadas
     public void aumentarCiegas() {
         contadorManos++;
+        int manosParaAumentarCiegas = 3;
         if (contadorManos % manosParaAumentarCiegas == 0) {
             smallBlind *= 2;
             bigBlind *= 2;

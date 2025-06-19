@@ -7,15 +7,13 @@ import java.util.List;
  * Clase que representa un jugador de Poker.
  */
 public class Jugador {
-    private final int numJugador;
     private final String nombre;
     private final List<Baraja.Carta> mano;
     private int saldo;
     boolean enJuego;
     private boolean haApostado; // <--- Estado individual de apuesta en la ronda
 
-    public Jugador(int numJugador, String nombre, int saldoInicial) {
-        this.numJugador = numJugador;
+    public Jugador(String nombre, int saldoInicial) {
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.saldo = saldoInicial;

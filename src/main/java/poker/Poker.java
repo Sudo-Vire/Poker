@@ -23,7 +23,7 @@ public class Poker {
             Interfaz.mostrarMensaje("Jugador " + numJugador + ", introduce tu nombre");
             String nombre = Interfaz.leerLinea();
             int saldoInicial = 1000;
-            jugadores.add(new Jugador(numJugador, nombre, saldoInicial));
+            jugadores.add(new Jugador(nombre, saldoInicial));
         }
 
         // Bucle principal del juego
