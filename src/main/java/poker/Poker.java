@@ -102,34 +102,19 @@ public class Poker {
 
         // Evaluar y mostrar las manos de los jugadores en juego
         for (Jugador jugador : jugadoresEnJuego) {
-            // Evaluar la mano del jugador
-            String mano = EvaluarManos.evaluarMano(jugador.getMano(), comunitarias);
+            EvaluarManos.ResultadoEvaluacion resultado = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
+            String mano = resultado.nombreJugada;
+            List<Baraja.Carta> mejores5Cartas = resultado.cartasPrincipales;
+
             Interfaz.mostrarMensaje(jugador.getNombre() + " tiene: " + mano);
 
-            // Obtener las 5 cartas exactas que forman la mejor mano
-            List<Baraja.Carta> todasLasCartas = new ArrayList<>(jugador.getMano());
-            todasLasCartas.addAll(comunitarias);
-            List<List<Baraja.Carta>> combinaciones = EvaluarManos.generarCombinaciones(todasLasCartas);
-            List<Baraja.Carta> mejores5Cartas = null;
-            int mejorValor = 0;
-            
-            for (List<Baraja.Carta> combinacion : combinaciones) {
-                String manoActual = EvaluarManos.evaluarCombinacion(combinacion);
-                int valorActual = EvaluarManos.obtenerValorMano(manoActual);
-                
-                if (valorActual > mejorValor) {
-                    mejorValor = valorActual;
-                    mejores5Cartas = new ArrayList<>(combinacion);
-                }
-            }
-            
-            // Mostrar las 5 mejores cartas del jugador en la misma línea
+            // Mostrar las 5 mejores cartas del jugador
             StringBuilder cartasEnLinea = new StringBuilder("Cartas usadas: ");
-            for (Baraja.Carta carta : Objects.requireNonNull(mejores5Cartas)) {
+            for (Baraja.Carta carta : mejores5Cartas) {
                 cartasEnLinea.append(carta.toString()).append(" ");
             }
             Interfaz.mostrarMensaje(cartasEnLinea.toString());
-            Interfaz.mostrarMensaje(""); // Línea en blanco para separar
+            Interfaz.mostrarMensaje("");
 
             if (ganador == null || CompararManos.compararManos(mano, mejorMano, jugador.getMano(), ganador.getMano(), comunitarias) > 0) {
                 ganador = jugador;
@@ -137,12 +122,13 @@ public class Poker {
             }
         }
 
+
         // Determinar si hay un ganador o un empate
         if (ganador != null) {
             boolean empate = false;
             for (Jugador jugador : jugadoresEnJuego) {
                 if (jugador != ganador) {
-                    String manoJugador = EvaluarManos.evaluarMano(jugador.getMano(), comunitarias);
+                    String manoJugador = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias).toString();
                     if (CompararManos.compararManos(mejorMano, manoJugador, ganador.getMano(), jugador.getMano(), comunitarias) == 0) {
                         empate = true;
                         break;

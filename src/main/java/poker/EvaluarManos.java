@@ -1,42 +1,44 @@
 package poker;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EvaluarManos {
 
-    public static String evaluarMano(List<Baraja.Carta> manoJugador, List<Baraja.Carta> cartasComunitarias) {
+    public static class ResultadoEvaluacion {
+        public String nombreJugada;
+        public List<Baraja.Carta> cartasPrincipales;
+
+        public ResultadoEvaluacion(String nombreJugada, List<Baraja.Carta> cartasPrincipales) {
+            this.nombreJugada = nombreJugada;
+            this.cartasPrincipales = cartasPrincipales;
+        }
+    }
+
+    public static ResultadoEvaluacion evaluarManoCompleta(List<Baraja.Carta> manoJugador, List<Baraja.Carta> cartasComunitarias) {
         List<Baraja.Carta> todasLasCartas = new ArrayList<>(manoJugador);
         todasLasCartas.addAll(cartasComunitarias);
 
-        // Generar todas las combinaciones posibles de 5 cartas
         List<List<Baraja.Carta>> combinaciones = generarCombinaciones(todasLasCartas);
 
         String mejorMano = "";
         int mejorValor = 0;
-        List<Baraja.Carta> mejorCombinacion = null;
+        List<Baraja.Carta> mejoresPrincipales = null;
 
         for (List<Baraja.Carta> combinacion : combinaciones) {
-            String manoActual = evaluarCombinacion(combinacion);
+            ResultadoEvaluacion resEval = evaluarCombinacion(combinacion);
+            String manoActual = resEval.nombreJugada;
             int valorActual = obtenerValorMano(manoActual);
 
-            if (valorActual > mejorValor) {
+            if (valorActual > mejorValor ||
+                    (valorActual == mejorValor && compararDesempate(resEval.cartasPrincipales, mejoresPrincipales) > 0)) {
                 mejorValor = valorActual;
                 mejorMano = manoActual;
-                mejorCombinacion = new ArrayList<>(combinacion);
+                mejoresPrincipales = new ArrayList<>(resEval.cartasPrincipales);
             }
         }
 
-        // Añadimos el kicker a la descripción de la mano si es aplicable
-        if (mejorCombinacion != null) {
-            String kicker = obtenerKicker(mejorCombinacion, mejorMano);
-            if (!kicker.isEmpty()) {
-                mejorMano += " con kicker " + kicker;
-            }
-        }
-
-        return mejorMano;
+        return new ResultadoEvaluacion(mejorMano, mejoresPrincipales);
     }
 
     public static List<List<Baraja.Carta>> generarCombinaciones(List<Baraja.Carta> cartas) {
@@ -45,143 +47,138 @@ public class EvaluarManos {
         return combinaciones;
     }
 
-    private static void generarCombinacionesRecursivo(List<Baraja.Carta> cartas, List<Baraja.Carta> actual, List<List<Baraja.Carta>> combinaciones, int inicio, int longitud) {
+    private static void generarCombinacionesRecursivo(List<Baraja.Carta> cartas, List<Baraja.Carta> actual,
+                                                      List<List<Baraja.Carta>> combinaciones, int inicio, int longitud) {
         if (longitud == 0) {
             combinaciones.add(new ArrayList<>(actual));
         } else {
             for (int i = inicio; i <= cartas.size() - longitud; i++) {
                 actual.add(cartas.get(i));
                 generarCombinacionesRecursivo(cartas, actual, combinaciones, i + 1, longitud - 1);
-                actual.remove(actual.size() - 1); // Cambio aquí, porque ArrayList no tiene removeLast()
+                actual.remove(actual.size() - 1);
             }
         }
     }
 
-    public static String evaluarCombinacion(List<Baraja.Carta> combinacion) {
-        // Ordenar las cartas de mayor a menor valor
-        combinacion.sort(Collections.reverseOrder());
+    public static ResultadoEvaluacion evaluarCombinacion(List<Baraja.Carta> mano) {
+        mano.sort(Comparator.comparingInt(c -> -c.valorNumerico));
+        boolean escalera = esEscalera(mano);
+        boolean color = esColor(mano);
 
-        if (esEscaleraReal(combinacion)) return "Escalera Real";
-        if (esEscaleraColor(combinacion)) return "Escalera de Color";
-        if (esPoker(combinacion)) return "Póker";
-        if (esFullHouse(combinacion)) return "Full House";
-        if (esColor(combinacion)) return "Color";
-        if (esEscalera(combinacion)) return "Escalera";
-        if (esTrio(combinacion)) return "Trío";
-        if (esDoblePareja(combinacion)) return "Doble Pareja";
-        if (esPareja(combinacion)) return "Pareja";
-
-        return "Carta Alta: " + combinacion.get(0).valor;
-    }
-
-    private static boolean esEscaleraReal(List<Baraja.Carta> combinacion) {
-        return esEscaleraColor(combinacion) && combinacion.get(0).valor.equals("A");
-    }
-
-    private static boolean esEscaleraColor(List<Baraja.Carta> combinacion) {
-        return esEscalera(combinacion) && esColor(combinacion);
-    }
-
-    private static boolean esPoker(List<Baraja.Carta> combinacion) {
-        return contarRepeticiones(combinacion, 4) == 1;
-    }
-
-    private static boolean esFullHouse(List<Baraja.Carta> combinacion) {
-        return contarRepeticiones(combinacion, 3) == 1 && contarRepeticiones(combinacion, 2) == 1;
-    }
-
-    private static boolean esColor(List<Baraja.Carta> combinacion) {
-        String palo = combinacion.get(0).palo;
-        for (Baraja.Carta carta : combinacion) {
-            if (!carta.palo.equals(palo)) {
-                return false;
-            }
+        if (escalera && color && mano.get(0).valorNumerico == 14) {
+            return new ResultadoEvaluacion("Escalera Real", new ArrayList<>(mano));
         }
-        return true;
-    }
 
-    private static boolean esEscalera(List<Baraja.Carta> combinacion) {
-        for (int i = 0; i < combinacion.size() - 1; i++) {
-            if (combinacion.get(i).valorNumerico - combinacion.get(i + 1).valorNumerico != 1) {
-                return false;
-            }
+        if (escalera && color) {
+            return new ResultadoEvaluacion("Escalera de Color", new ArrayList<>(mano));
         }
-        return true;
+
+        Map<Integer, List<Baraja.Carta>> grupos = agruparPorValor(mano);
+
+        if (grupos.values().stream().anyMatch(l -> l.size() == 4)) {
+            List<Baraja.Carta> cuarteto = grupos.values().stream().filter(l -> l.size() == 4).findFirst().get();
+            Baraja.Carta kicker = mano.stream().filter(c -> !cuarteto.contains(c)).findFirst().get();
+            List<Baraja.Carta> resultado = new ArrayList<>(cuarteto);
+            resultado.add(kicker);
+            return new ResultadoEvaluacion("Poker", resultado);
+        }
+
+        if (grupos.values().stream().anyMatch(l -> l.size() == 3) &&
+                grupos.values().stream().anyMatch(l -> l.size() == 2)) {
+            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().get();
+            List<Baraja.Carta> par = grupos.values().stream().filter(l -> l.size() == 2).findFirst().get();
+            List<Baraja.Carta> resultado = new ArrayList<>(trio);
+            resultado.addAll(par);
+            return new ResultadoEvaluacion("Full", resultado);
+        }
+
+        if (color) {
+            return new ResultadoEvaluacion("Color", new ArrayList<>(mano));
+        }
+
+        if (escalera) {
+            return new ResultadoEvaluacion("Escalera", new ArrayList<>(mano));
+        }
+
+        if (grupos.values().stream().anyMatch(l -> l.size() == 3)) {
+            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().get();
+            List<Baraja.Carta> kicker = mano.stream().filter(c -> !trio.contains(c)).limit(2).toList();
+            List<Baraja.Carta> resultado = new ArrayList<>(trio);
+            resultado.addAll(kicker);
+            return new ResultadoEvaluacion("Trío", resultado);
+        }
+
+        List<List<Baraja.Carta>> pares = grupos.values().stream()
+                .filter(l -> l.size() == 2)
+                .sorted((a, b) -> b.get(0).valorNumerico - a.get(0).valorNumerico)
+                .toList();
+
+        if (pares.size() >= 2) {
+            List<Baraja.Carta> dosPares = new ArrayList<>();
+            dosPares.addAll(pares.get(0));
+            dosPares.addAll(pares.get(1));
+            Baraja.Carta kicker = mano.stream().filter(c -> !dosPares.contains(c)).findFirst().get();
+            dosPares.add(kicker);
+            return new ResultadoEvaluacion("Doble Par", dosPares);
+        }
+
+        if (pares.size() == 1) {
+            List<Baraja.Carta> par = pares.get(0);
+            List<Baraja.Carta> kicker = mano.stream().filter(c -> !par.contains(c)).limit(3).toList();
+            List<Baraja.Carta> resultado = new ArrayList<>(par);
+            resultado.addAll(kicker);
+            return new ResultadoEvaluacion("Par", resultado);
+        }
+
+        return new ResultadoEvaluacion("Carta Alta", new ArrayList<>(mano.subList(0, 5)));
     }
 
-    private static boolean esTrio(List<Baraja.Carta> combinacion) {
-        return contarRepeticiones(combinacion, 3) == 1;
-    }
-
-    private static boolean esDoblePareja(List<Baraja.Carta> combinacion) {
-        return contarRepeticiones(combinacion, 2) == 2;
-    }
-
-    private static boolean esPareja(List<Baraja.Carta> combinacion) {
-        return contarRepeticiones(combinacion, 2) == 1;
-    }
-
-    private static int contarRepeticiones(List<Baraja.Carta> combinacion, int numero) {
-        int count = 0;
-        for (int i = 0; i < combinacion.size(); i++) {
-            int repeticiones = 1;
-            for (int j = i + 1; j < combinacion.size(); j++) {
-                if (combinacion.get(i).valor.equals(combinacion.get(j).valor)) {
-                    repeticiones++;
+    private static boolean esEscalera(List<Baraja.Carta> mano) {
+        List<Integer> valores = mano.stream().map(c -> c.valorNumerico).distinct().sorted(Comparator.reverseOrder()).toList();
+        for (int i = 0; i <= valores.size() - 5; i++) {
+            boolean consecutivos = true;
+            for (int j = 0; j < 4; j++) {
+                if (valores.get(i + j) - 1 != valores.get(i + j + 1)) {
+                    consecutivos = false;
+                    break;
                 }
             }
-            if (repeticiones == numero) {
-                count++;
-                i += numero - 1;
-            }
+            if (consecutivos) return true;
         }
-        return count;
+        // Comprobación especial A-2-3-4-5
+        return new HashSet<>(valores).containsAll(Arrays.asList(14, 5, 4, 3, 2));
     }
 
-    public static int obtenerValorMano(String mano) {
-        return switch (mano) {
+    private static boolean esColor(List<Baraja.Carta> mano) {
+        return mano.stream().collect(Collectors.groupingBy(c -> c.palo)).values().stream().anyMatch(l -> l.size() >= 5);
+    }
+
+    private static Map<Integer, List<Baraja.Carta>> agruparPorValor(List<Baraja.Carta> mano) {
+        return mano.stream().collect(Collectors.groupingBy(c -> c.valorNumerico));
+    }
+
+    static int obtenerValorMano(String nombre) {
+        return switch (nombre) {
             case "Escalera Real" -> 10;
             case "Escalera de Color" -> 9;
-            case "Póker" -> 8;
-            case "Full House" -> 7;
+            case "Poker" -> 8;
+            case "Full" -> 7;
             case "Color" -> 6;
             case "Escalera" -> 5;
             case "Trío" -> 4;
-            case "Doble Pareja" -> 3;
-            case "Pareja" -> 2;
-            default -> 1;
+            case "Doble Par" -> 3;
+            case "Par" -> 2;
+            case "Carta Alta" -> 1;
+            default -> 0;
         };
     }
 
-    private static String obtenerKicker(List<Baraja.Carta> combinacion, String mano) {
-        if (mano.startsWith("Pareja") || mano.startsWith("Trío") || mano.startsWith("Doble Pareja")) {
-            List<Baraja.Carta> kickers = new ArrayList<>();
-
-            List<String> valoresPrincipales = getStrings(mano);
-
-            for (Baraja.Carta carta : combinacion) {
-                if (!valoresPrincipales.contains(carta.valor)) {
-                    kickers.add(carta);
-                }
-            }
-
-            kickers.sort(Collections.reverseOrder());
-            return kickers.isEmpty() ? "" : kickers.get(0).valor;
+    private static int compararDesempate(List<Baraja.Carta> mano1, List<Baraja.Carta> mano2) {
+        if (mano1 == null || mano2 == null) return 0;
+        for (int i = 0; i < Math.min(mano1.size(), mano2.size()); i++) {
+            int diff = mano1.get(i).valorNumerico - mano2.get(i).valorNumerico;
+            if (diff != 0) return diff;
         }
-        return "";
-    }
-
-    private static List<String> getStrings(String mano) {
-        String[] partes = mano.split(" ");
-        List<String> valoresPrincipales = new ArrayList<>();
-        for (String parte : partes) {
-            if (!parte.equals("de") && !parte.equals("Carta") && !parte.equals("Alta:") &&
-                    !parte.equals("Pareja") && !parte.equals("Trío") && !parte.equals("Doble") &&
-                    !parte.equals("Full") && !parte.equals("House") && !parte.equals("Póker") &&
-                    !parte.equals("Color") && !parte.equals("Escalera") && !parte.equals("con") && !parte.equals("kicker")) {
-                valoresPrincipales.add(parte);
-            }
-        }
-        return valoresPrincipales;
+        return 0;
     }
 }
