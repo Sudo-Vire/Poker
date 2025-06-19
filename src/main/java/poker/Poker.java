@@ -2,7 +2,6 @@ package poker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Poker {
@@ -10,7 +9,7 @@ public class Poker {
         Scanner scanner = new Scanner(System.in);
         Interfaz.mostrarMensaje("Bienvenido al juego de Poker Texas Hold'em!");
 
-        // Configuración inicial del juego con valores personal
+        // Configuración inicial del juego con valores personalizados
         int smallBlind = 10; 
         int bigBlind = 20; 
         int manosParaAumentarCiegas = 4; 
