@@ -13,25 +13,14 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 ## 📁 Estructura del Proyecto
 <pre>
 Poker/
-├──.idea/ 
-│   ├── dictionaries
-│   │   └── project.xml
-│   ├── .gitignore 
-│   ├── misc.xml
-│   ├── modules.xml
-│   └── vcs.xml
-├── src/
-│   └── poker/
-│       ├── Apuesta.java
-│       ├── Baraja.java
-│       ├── CompararManos.java
-│       ├── EvaluarManos.java
-│       ├── Interfaz.java
-│       ├── Jugador.java
-│       └── Poker.java
-├── .gitignore    
-├── Poker.iml       
-└── README.md
+    ├── .idea/                       # Archivos de configuración de IntelliJ IDEA
+    ├── out/                         # Archivos compilados por IntelliJ
+    ├── src/                         # Código fuente del programa
+    ├── target/                      # Archivos construidos por Maven y ejecutable del programa
+    ├── .gitignore
+    ├── Poker.iml
+    ├── pom.xml                    
+    └── Poker/README.md
 </pre>
 
 ---
@@ -43,12 +32,13 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 
 ## 🚀 Cómo ejecutar
 
-1. Clona el repositorio:
-   "git clone git clone https://github.com/Sudo-Vire/Poker.git"
+1. Descarga el archivo `.jar` de la release que prefieras (se recomienda usar la última versión)
 
-2. Abre el proyecto en tu IDE favorito (Este repo se ha desarrollado originalmente en IntelliJ).
+2. Abre git bash 
 
-3. Ejecuta la clase `Poker.java` ubicada en el paquete `poker`.
+3. Ve al directorio en el que descargaste el archivo `.jar`: **cd C:/~**
+
+4. Ejecuta el programa: **java -jar poker-1.0-beta.jar**
 
 > 💡 **Requisitos:** Java 17 o superior.
 
