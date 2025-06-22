@@ -6,12 +6,7 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 ## 🎯 Características:
 - Simulación de partidas de Texas Hold'em para múltiples jugadores.
 - Lógica completa del juego: reparto de cartas, rondas de apuestas y determinación del ganador.
-- Interfaz por línea de comandos.
-
----
-
-## 📄 Licencia
-Este proyecto está licenciado bajo la licencia Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). Puedes compartir y adaptar el material siempre que se dé crédito y no se use con fines comerciales salvo consentimiento explícito.
+- Juego CLI.
 
 ---
 
@@ -26,6 +21,11 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 4. Ejecuta el programa: **java -jar poker-~.jar**
 
 > 💡 **Requisitos:** Java 17 o superior.
+
+---
+
+## 📄 Licencia
+Este proyecto está licenciado bajo la licencia Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). Puedes compartir y adaptar el material siempre que se dé crédito y no se use con fines comerciales salvo consentimiento explícito.
 
 ---
 
