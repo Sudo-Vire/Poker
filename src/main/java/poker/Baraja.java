@@ -57,7 +57,6 @@ public class Baraja {
 
         @Override
         public int compareTo(Carta o) {
-            // Comparamos en orden ascendente
             return Integer.compare(this.valorNumerico, o.valorNumerico);
         }
     }

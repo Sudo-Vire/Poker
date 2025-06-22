@@ -7,6 +7,7 @@ import java.util.List;
 
 public class CompararManos {
 
+    //Función para determinar el ganador
     public static int compararManos(String mano1, String mano2, List<Baraja.Carta> manoJugador1, List<Baraja.Carta> manoJugador2, List<Baraja.Carta> cartasComunitarias) {
         String[] partesMano1 = mano1.split(" con kicker ");
         String[] partesMano2 = mano2.split(" con kicker ");

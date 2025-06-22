@@ -122,7 +122,6 @@ public class Apuesta {
                     }
                 }
             }
-            // Si todos igualaron la apuesta o pasaron, termina la ronda
             boolean rondaTerminada = true;
             int jugadoresActivos = 0;
             for (int i = 0; i < n; i++) {

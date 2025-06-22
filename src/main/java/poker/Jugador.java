@@ -26,7 +26,6 @@ public class Jugador {
         }
     }
 
-    // Muestra la mano del jugador
     public void mostrarMano() {
         StringBuilder manoEnLinea = new StringBuilder(nombre + " tiene: ");
         for (Baraja.Carta carta : mano) {
@@ -39,14 +38,12 @@ public class Jugador {
         saldo += cantidad;
     }
 
-    // Prepara al jugador para una nueva mano
     public void nuevaMano() {
         mano.clear();
-        enJuego = (saldo > 0); // Solo sigue en juego si tiene fichas
+        enJuego = (saldo > 0);
         haApostado = false;
     }
 
-    // Getters y setters
     public int getSaldo() { return saldo; }
     public void setSaldo(int saldo) {
         if (saldo < 0) throw new IllegalArgumentException("El saldo no puede ser negativo");

@@ -144,7 +144,6 @@ public class EvaluarManos {
             }
             if (consecutivos) return true;
         }
-        // Comprobación especial A-2-3-4-5
         return new HashSet<>(valores).containsAll(Arrays.asList(14, 5, 4, 3, 2));
     }
 
@@ -156,7 +155,6 @@ public class EvaluarManos {
         return mano.stream().collect(Collectors.groupingBy(c -> c.valorNumerico));
     }
 
-    //Establece valor a cada mano para la comparación
     static int obtenerValorMano(String nombre) {
         return switch (nombre) {
             case "Escalera Real" -> 10;

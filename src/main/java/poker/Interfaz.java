@@ -33,7 +33,6 @@ public class Interfaz {
         scanner.close();
     }
 
-    // Función aspr para manejar las opciones de apuesta
     public static boolean aspr(Jugador jugador, int cantidadPorIgualar, int[] pozo, int[] apuestas, int indiceJugador, int[] apuestaActual, List<Jugador> jugadores, String fase, int bigBlindAmount) {
         boolean accionValida = false;
         boolean terminarMano = false;
@@ -95,15 +94,13 @@ public class Interfaz {
                 Interfaz.mostrarMensaje(ganador.getNombre() + " gana la mano y se lleva " + pozo[0] + " fichas.");
                 ganador.ganar(pozo[0]);
                 pozo[0] = 0;
-                terminarMano = true; // Indicador para terminar la mano
+                terminarMano = true;
             }
         } else {
             Interfaz.mostrarMensaje("Opción no válida.");
         }
 
-        // Devolver si la acción fue válida (y manejar terminación de mano en el llamador)
         if (terminarMano) {
-            // Usamos un valor especial para indicar que la mano debe terminar
             apuestaActual[0] = -999;
         }
         return accionValida;

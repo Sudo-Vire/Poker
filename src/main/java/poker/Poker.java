@@ -25,7 +25,6 @@ public class Poker {
             jugadores.add(new Jugador(nombre, saldoInicial));
         }
 
-        // Asignar posiciones iniciales de ciegas y dealer
         apuesta.asignarPosicionesIniciales(jugadores);
 
         int manoActual = 1;
@@ -33,7 +32,6 @@ public class Poker {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
             jugarMano(jugadores, baraja, apuesta);
-            // Rotar posiciones de dealer y ciegas al final de la mano
             apuesta.rotarPosiciones(jugadores);
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
@@ -55,7 +53,7 @@ public class Poker {
         List<Baraja.Carta> comunitarias = new ArrayList<>();
         int[] pozo = {0};
         int n = jugadores.size();
-        int[] apuestas = new int[n]; // Vector de apuestas
+        int[] apuestas = new int[n];
 
         for (Jugador jugador : jugadores) {
             jugador.nuevaMano();
@@ -65,7 +63,7 @@ public class Poker {
                 Interfaz.mostrarMensaje("");
             }
         }
-        apuesta.ponerCiegas(jugadores, pozo, apuestas); // Ahora pasas aquí "apuestas"
+        apuesta.ponerCiegas(jugadores, pozo, apuestas);
 
         // PRE-FLOP
         int primerJugadorPreFlop = (jugadores.size() == 2)
@@ -115,7 +113,6 @@ public class Poker {
             if (jugador.isEnJuego()) jugadoresEnJuego.add(jugador);
         }
 
-        // Evaluar y mostrar las manos de los jugadores en juego
         for (Jugador jugador : jugadoresEnJuego) {
             EvaluarManos.ResultadoEvaluacion resultado = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
             String mano = resultado.nombreJugada;
@@ -136,7 +133,6 @@ public class Poker {
             }
         }
 
-        // Determinar si hay un ganador o un empate
         if (ganador != null) {
             boolean empate = false;
             for (Jugador jugador : jugadoresEnJuego) {
