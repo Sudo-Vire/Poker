@@ -1,6 +1,6 @@
 package poker;
 
-import java.util.List;
+import java.util.List;  
 
 public class Apuesta {
     private static int smallBlind;
@@ -54,7 +54,7 @@ public class Apuesta {
         Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la nueva Ciega Grande.");
     }
 
-    public void ponerCiegas(List<Jugador> jugadores, int[] pozo) {
+    public void ponerCiegas(List<Jugador> jugadores, int[] pozo, int[] apuestas) {
         // Small Blind
         if (smallBlindIndex >= 0 && smallBlindIndex < jugadores.size()) {
             Jugador sb = jugadores.get(smallBlindIndex);
@@ -62,6 +62,7 @@ public class Apuesta {
                 int sbMonto = Math.min(sb.getSaldo(), smallBlind);
                 sb.setSaldo(sb.getSaldo() - sbMonto);
                 pozo[0] += sbMonto;
+                apuestas[smallBlindIndex] = sbMonto; // <<== ADICIONALMENTE
                 Interfaz.mostrarMensaje(sb.getNombre() + " pone la ciega pequeña de " + sbMonto);
             }
         }
@@ -73,6 +74,7 @@ public class Apuesta {
                 int bbMonto = Math.min(bb.getSaldo(), bigBlind);
                 bb.setSaldo(bb.getSaldo() - bbMonto);
                 pozo[0] += bbMonto;
+                apuestas[bigBlindIndex] = bbMonto; // <<== ADICIONALMENTE
                 Interfaz.mostrarMensaje(bb.getNombre() + " pone la ciega grande de " + bbMonto);
             }
         }
