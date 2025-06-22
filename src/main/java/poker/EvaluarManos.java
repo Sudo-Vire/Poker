@@ -76,17 +76,17 @@ public class EvaluarManos {
         Map<Integer, List<Baraja.Carta>> grupos = agruparPorValor(mano);
 
         if (grupos.values().stream().anyMatch(l -> l.size() == 4)) {
-            List<Baraja.Carta> cuarteto = grupos.values().stream().filter(l -> l.size() == 4).findFirst().get();
-            Baraja.Carta kicker = mano.stream().filter(c -> !cuarteto.contains(c)).findFirst().get();
+            List<Baraja.Carta> cuarteto = grupos.values().stream().filter(l -> l.size() == 4).findFirst().orElse(new ArrayList<>());
+            Baraja.Carta kicker = mano.stream().filter(c -> !cuarteto.contains(c)).findFirst().orElse(null);
             List<Baraja.Carta> resultado = new ArrayList<>(cuarteto);
-            resultado.add(kicker);
+            if (kicker != null) resultado.add(kicker);
             return new ResultadoEvaluacion("Poker", resultado);
         }
 
         if (grupos.values().stream().anyMatch(l -> l.size() == 3) &&
                 grupos.values().stream().anyMatch(l -> l.size() == 2)) {
-            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().get();
-            List<Baraja.Carta> par = grupos.values().stream().filter(l -> l.size() == 2).findFirst().get();
+            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
+            List<Baraja.Carta> par = grupos.values().stream().filter(l -> l.size() == 2).findFirst().orElse(new ArrayList<>());
             List<Baraja.Carta> resultado = new ArrayList<>(trio);
             resultado.addAll(par);
             return new ResultadoEvaluacion("Full", resultado);
@@ -101,7 +101,7 @@ public class EvaluarManos {
         }
 
         if (grupos.values().stream().anyMatch(l -> l.size() == 3)) {
-            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().get();
+            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
             List<Baraja.Carta> kicker = mano.stream().filter(c -> !trio.contains(c)).limit(2).toList();
             List<Baraja.Carta> resultado = new ArrayList<>(trio);
             resultado.addAll(kicker);
@@ -117,8 +117,7 @@ public class EvaluarManos {
             List<Baraja.Carta> dosPares = new ArrayList<>();
             dosPares.addAll(pares.get(0));
             dosPares.addAll(pares.get(1));
-            Baraja.Carta kicker = mano.stream().filter(c -> !dosPares.contains(c)).findFirst().get();
-            dosPares.add(kicker);
+            mano.stream().filter(c -> !dosPares.contains(c)).findFirst().ifPresent(dosPares::add);
             return new ResultadoEvaluacion("Doble Par", dosPares);
         }
 

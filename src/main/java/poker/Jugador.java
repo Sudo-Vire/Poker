@@ -42,7 +42,7 @@ public class Jugador {
     // Prepara al jugador para una nueva mano
     public void nuevaMano() {
         mano.clear();
-        enJuego = true;
+        enJuego = (saldo > 0); // Solo sigue en juego si tiene fichas
         haApostado = false;
     }
 
@@ -56,5 +56,4 @@ public class Jugador {
     public boolean isEnJuego() { return enJuego; }
     public List<Baraja.Carta> getMano() { return new ArrayList<>(mano); }
     public boolean isHaApostado() { return haApostado; }
-    public void setHaApostado(boolean haApostado) { this.haApostado = haApostado; }
-}
+    public void setHaApostado(boolean haApostado) {this.haApostado = haApostado; }}

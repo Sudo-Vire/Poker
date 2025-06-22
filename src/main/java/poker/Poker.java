@@ -9,7 +9,6 @@ public class Poker {
         Scanner scanner = new Scanner(System.in);
         Interfaz.mostrarMensaje("Bienvenido al juego de Poker Texas Hold'em!");
 
-        // Configuración inicial del juego
         int smallBlind = 10;
         int bigBlind = 20;
         int manosParaAumentarCiegas = 3;
@@ -26,12 +25,16 @@ public class Poker {
             jugadores.add(new Jugador(nombre, saldoInicial));
         }
 
-        // Bucle principal del juego
+        // Asignar posiciones iniciales de ciegas y dealer
+        apuesta.asignarPosicionesIniciales(jugadores);
+
         int manoActual = 1;
         while (true) {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
             jugarMano(jugadores, baraja, apuesta);
+            // Rotar posiciones de dealer y ciegas al final de la mano
+            apuesta.rotarPosiciones(jugadores);
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
             if (!respuesta.equalsIgnoreCase("s")) {
@@ -40,7 +43,6 @@ public class Poker {
             manoActual++;
         }
 
-        // Mostrar saldos finales
         for (Jugador jugador : jugadores) {
             Interfaz.mostrarMensaje(jugador.getNombre() + " termina con un saldo de: " + jugador.getSaldo());
         }
@@ -52,8 +54,9 @@ public class Poker {
     private static void jugarMano(List<Jugador> jugadores, Baraja baraja, Apuesta apuesta) {
         List<Baraja.Carta> comunitarias = new ArrayList<>();
         int[] pozo = {0};
+        int n = jugadores.size();
+        int[] apuestas = new int[n]; // Vector de apuestas
 
-        // Repartir cartas iniciales
         for (Jugador jugador : jugadores) {
             jugador.nuevaMano();
             jugador.recibirCarta(baraja.repartirCarta());
@@ -62,19 +65,45 @@ public class Poker {
                 Interfaz.mostrarMensaje("");
             }
         }
+        apuesta.ponerCiegas(jugadores, pozo, apuestas); // Ahora pasas aquí "apuestas"
 
-        // Rondas de apuestas y fases de juego
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop");
+        // PRE-FLOP
+        int primerJugadorPreFlop = (jugadores.size() == 2)
+                ? apuesta.getSmallBlindIndex()
+                : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
+        if (terminoMano(pozo, jugadores)) return;
+
+        // FLOP
+        apuestas = new int[n];
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
         }
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop");
-        comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn");
-        comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River");
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
+        if (terminoMano(pozo, jugadores)) return;
 
+        // TURN
+        apuestas = new int[n];
+        comunitarias.add(baraja.repartirCarta());
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
+        if (terminoMano(pozo, jugadores)) return;
+
+        // RIVER
+        apuestas = new int[n];
+        comunitarias.add(baraja.repartirCarta());
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
+        if (terminoMano(pozo, jugadores)) return;
+
+        // SHOWDOWN
         showdown(jugadores, comunitarias, pozo);
+    }
+
+    private static boolean terminoMano(int[] pozo, List<Jugador> jugadores) {
+        int activos = 0;
+        for (Jugador j : jugadores) {
+            if (j.isEnJuego() && j.getSaldo() > 0) activos++;
+        }
+        return activos <= 1 || pozo[0] == 0;
     }
 
     private static void showdown(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, int[] pozo) {
@@ -94,7 +123,6 @@ public class Poker {
 
             Interfaz.mostrarMensaje(jugador.getNombre() + " tiene: " + mano);
 
-            // Mostrar las 5 mejores cartas del jugador
             StringBuilder cartasEnLinea = new StringBuilder("Cartas usadas: ");
             for (Baraja.Carta carta : mejores5Cartas) {
                 cartasEnLinea.append(carta.toString()).append(" ");
