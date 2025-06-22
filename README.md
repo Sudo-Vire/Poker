@@ -13,11 +13,11 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 ## 📁 Estructura del Proyecto
 <pre>
 Poker/
-    ├── .idea/                       # Archivos de configuración de IntelliJ IDEA
-    ├── out/                         # Archivos compilados por IntelliJ
-    ├── src/                         # Código fuente del programa
-    ├── target/                      # Archivos construidos por Maven y ejecutable del programa
-    ├── .gitignore
+    ├── .idea/                       
+    ├── out/                       
+    ├── src/                         
+    ├── target/                   
+    ├── .gitignore                   
     ├── Poker.iml
     ├── pom.xml                    
     └── Poker/README.md
@@ -38,7 +38,7 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 
 3. Ve al directorio en el que descargaste el archivo `.jar`: **cd C:/~**
 
-4. Ejecuta el programa: **java -jar poker-1.0-beta.jar**
+4. Ejecuta el programa: **java -jar poker-~.jar**
 
 > 💡 **Requisitos:** Java 17 o superior.
 
