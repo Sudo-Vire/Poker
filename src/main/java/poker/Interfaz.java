@@ -60,7 +60,7 @@ public class Interfaz {
         } else if ((jugada.equals("pasar") || jugada.equals("1")) && cantidadPorIgualar == 0) {
             accionValida = true;
         } else if ((jugada.equals("apostar") || jugada.equals("2")) && cantidadPorIgualar == 0) {
-            int minApuesta = (fase.equals("Pre-Flop")) ? bigBlindAmount : 1; // En Pre-Flop, apuesta mínima es big blind
+            int minApuesta = (fase.equals("Pre-Flop")) ? bigBlindAmount : 1;
             int cantidad = Interfaz.leerNumero("¿Cuánto quieres apostar? (min " + minApuesta + "): ", minApuesta, jugador.getSaldo());
             jugador.setSaldo(jugador.getSaldo() - cantidad);
             pozo[0] += cantidad;

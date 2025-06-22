@@ -1,6 +1,6 @@
 package poker;
 
-import java.util.List;  
+import java.util.List;
 
 public class Apuesta {
     private static int smallBlind;
@@ -30,19 +30,17 @@ public class Apuesta {
         return bigBlindIndex;
     }
 
-    // Método para asignar posiciones iniciales de dealer y ciegas
     public void asignarPosicionesIniciales(List<Jugador> jugadores) {
         if (jugadores.size() < 2) {
             throw new IllegalStateException("No hay suficientes jugadores para asignar posiciones.");
         }
-        dealerIndex = 0; // El primer jugador es el dealer inicialmente
-        smallBlindIndex = (dealerIndex + 1) % jugadores.size(); // Siguiente es small blind
-        bigBlindIndex = (dealerIndex + 2) % jugadores.size(); // Siguiente es big blind
+        dealerIndex = 0;
+        smallBlindIndex = (dealerIndex + 1) % jugadores.size();
+        bigBlindIndex = (dealerIndex + 2) % jugadores.size();
         Interfaz.mostrarMensaje(jugadores.get(smallBlindIndex).getNombre() + " es la Ciega Pequeña.");
         Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la Ciega Grande.");
     }
 
-    // Método para rotar posiciones después de cada mano
     public void rotarPosiciones(List<Jugador> jugadores) {
         if (jugadores.size() < 2) {
             throw new IllegalStateException("No hay suficientes jugadores para rotar posiciones.");
@@ -62,7 +60,7 @@ public class Apuesta {
                 int sbMonto = Math.min(sb.getSaldo(), smallBlind);
                 sb.setSaldo(sb.getSaldo() - sbMonto);
                 pozo[0] += sbMonto;
-                apuestas[smallBlindIndex] = sbMonto; // <<== ADICIONALMENTE
+                apuestas[smallBlindIndex] = sbMonto;
                 Interfaz.mostrarMensaje(sb.getNombre() + " pone la ciega pequeña de " + sbMonto);
             }
         }
@@ -74,7 +72,7 @@ public class Apuesta {
                 int bbMonto = Math.min(bb.getSaldo(), bigBlind);
                 bb.setSaldo(bb.getSaldo() - bbMonto);
                 pozo[0] += bbMonto;
-                apuestas[bigBlindIndex] = bbMonto; // <<== ADICIONALMENTE
+                apuestas[bigBlindIndex] = bbMonto;
                 Interfaz.mostrarMensaje(bb.getNombre() + " pone la ciega grande de " + bbMonto);
             }
         }
@@ -94,28 +92,10 @@ public class Apuesta {
         }
     }
 
-    public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase, int primerJugador) {
+    public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase, int primerJugador, int[] apuestas) {
         int n = jugadores.size();
-        int[] apuestaActual = new int[1]; // Usamos un array para poder modificarlo dentro de aspr
-        // En Pre-Flop, la apuesta inicial es la big blind
+        int[] apuestaActual = new int[1];
         apuestaActual[0] = (fase.equals("Pre-Flop")) ? bigBlind : 0;
-        int[] apuestas = new int[n];
-
-        // En Pre-Flop, inicializamos las apuestas de las ciegas ya pagadas
-        if (fase.equals("Pre-Flop")) {
-            if (smallBlindIndex >= 0 && smallBlindIndex < jugadores.size()) {
-                Jugador sb = jugadores.get(smallBlindIndex);
-                if (sb.isEnJuego() && sb.getSaldo() > 0) {
-                    apuestas[smallBlindIndex] = Math.min(sb.getSaldo(), smallBlind);
-                }
-            }
-            if (bigBlindIndex >= 0 && bigBlindIndex < jugadores.size()) {
-                Jugador bb = jugadores.get(bigBlindIndex);
-                if (bb.isEnJuego() && bb.getSaldo() > 0) {
-                    apuestas[bigBlindIndex] = Math.min(bb.getSaldo(), bigBlind);
-                }
-            }
-        }
 
         while (true) {
             for (int offset = 0; offset < n; offset++) {
@@ -137,12 +117,12 @@ public class Apuesta {
 
                 while (!accionValida) {
                     accionValida = Interfaz.aspr(jugador, cantidadPorIgualar, pozo, apuestas, i, apuestaActual, jugadores, fase, bigBlind);
-                    if (apuestaActual[0] == -999) { // Valor especial indica terminación de la mano
-                        return; // Termina la ronda y la mano de inmediato
+                    if (apuestaActual[0] == -999) {
+                        return;
                     }
                 }
             }
-            // Si todos igualaron apuesta o pasaron, termina la ronda
+            // Si todos igualaron la apuesta o pasaron, termina la ronda
             boolean rondaTerminada = true;
             int jugadoresActivos = 0;
             for (int i = 0; i < n; i++) {

@@ -71,26 +71,27 @@ public class Poker {
         int primerJugadorPreFlop = (jugadores.size() == 2)
                 ? apuesta.getSmallBlindIndex()
                 : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop);
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
         // FLOP
+        apuestas = new int[n];
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
         }
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex());
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
         // TURN
         apuestas = new int[n];
         comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex());
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
         // RIVER
         apuestas = new int[n];
         comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex());
+        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
         // SHOWDOWN
