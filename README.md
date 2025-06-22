@@ -10,21 +10,6 @@ Este proyecto es una implementación del juego de póker (Texas Hold'em) desarro
 
 ---
 
-## 📁 Estructura del Proyecto
-<pre>
-Poker/
-    ├── .idea/                       
-    ├── out/                       
-    ├── src/                         
-    ├── target/                   
-    ├── .gitignore                   
-    ├── Poker.iml
-    ├── pom.xml                    
-    └── Poker/README.md
-</pre>
-
----
-
 ## 📄 Licencia
 Este proyecto está licenciado bajo la licencia Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0). Puedes compartir y adaptar el material siempre que se dé crédito y no se use con fines comerciales salvo consentimiento explícito.
 
