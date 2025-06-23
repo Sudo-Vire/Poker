@@ -2,77 +2,78 @@ package poker;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
+// Clase principal del programa Poker Texas Hold'em
 public class Poker {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Interfaz.mostrarMensaje("Bienvenido al juego de Poker Texas Hold'em!");
 
-        int smallBlind = 10;
-        int bigBlind = 20;
-        int manosParaAumentarCiegas = 3;
-        Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas);
-        Baraja baraja = new Baraja();
-        List<Jugador> jugadores = new ArrayList<>();
+        int smallBlind = 10;                                                          // Cantidad para la ciega pequeña inicial
+        int bigBlind = 20;                                                            // Cantidad para la ciega grande inicial
+        int manosParaAumentarCiegas = 3;                                              // Tras cuántas manos se doblan las ciegas
+        Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas); // Manejador de apuestas y ciegas
+        Baraja baraja = new Baraja();                                                 // Baraja del juego
+        List<Jugador> jugadores = new ArrayList<>();                                  // Lista de jugadores
 
+        // Pide la cantidad de jugadores
         int numJugadores = Interfaz.leerNumero("¿Cuántos jugadores van a jugar? (2-10): ", 2, 10);
         for (int i = 0; i < numJugadores; i++) {
             int numJugador = i + 1;
             Interfaz.mostrarMensaje("Jugador " + numJugador + ", introduce tu nombre");
-            String nombre = Interfaz.leerLinea();
-            int saldoInicial = 1000;
+            String nombre = Interfaz.leerLinea(); // Lee el nombre del jugador
+            int saldoInicial = 1000;              // Saldo inicial asignado
             jugadores.add(new Jugador(nombre, saldoInicial));
         }
 
-        apuesta.asignarPosicionesIniciales(jugadores);
+        apuesta.asignarPosicionesIniciales(jugadores); // Asigna dealer, ciega pequeña y grande
 
         int manoActual = 1;
+        // Bucle de juego principal (cada iteración es una mano de póker)
         while (true) {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
-            jugarMano(jugadores, baraja, apuesta);
-            apuesta.rotarPosiciones(jugadores);
+            jugarMano(jugadores, baraja, apuesta);                          // Se juega la mano completa
+            apuesta.rotarPosiciones(jugadores);                             // Se rota dealer/ciegas para la siguiente mano
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
-            if (!respuesta.equalsIgnoreCase("s")) {
+            if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego
                 break;
             }
             manoActual++;
         }
 
+        // Al terminar la sesión, muestra el saldo final de todos los jugadores
         for (Jugador jugador : jugadores) {
             Interfaz.mostrarMensaje(jugador.getNombre() + " termina con un saldo de: " + jugador.getSaldo());
         }
 
         Interfaz.cerrarScanner();
-        scanner.close();
     }
 
+    // Ejecuta el ciclo completo de una mano
     private static void jugarMano(List<Jugador> jugadores, Baraja baraja, Apuesta apuesta) {
-        List<Baraja.Carta> comunitarias = new ArrayList<>();
-        int[] pozo = {0};
+        List<Baraja.Carta> comunitarias = new ArrayList<>();    // Cartas comunitarias en la mesa
+        int[] pozo = {0};                                       // Pozo de fichas por mano
         int n = jugadores.size();
-        int[] apuestas = new int[n];
+        int[] apuestas = new int[n];                            // Rastrea las apuestas individuales en cada ronda
 
+        // Reparte 2 cartas a cada jugador
         for (Jugador jugador : jugadores) {
             jugador.nuevaMano();
             jugador.recibirCarta(baraja.repartirCarta());
             jugador.recibirCarta(baraja.repartirCarta());
-            for (int i = 0; i < 10; i++) {
-                Interfaz.mostrarMensaje("");
-            }
+            Interfaz.limpiarPantalla();
         }
         apuesta.ponerCiegas(jugadores, pozo, apuestas);
 
-        // PRE-FLOP
+        // Pre-Flop
         int primerJugadorPreFlop = (jugadores.size() == 2)
                 ? apuesta.getSmallBlindIndex()
                 : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
-        if (terminoMano(pozo, jugadores)) return;
+        if (terminoMano(pozo, jugadores)) return; // Sale si solo queda un jugador
 
-        // FLOP
+        // Flop
         apuestas = new int[n];
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
@@ -80,22 +81,23 @@ public class Poker {
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
-        // TURN
+        // Turn
         apuestas = new int[n];
         comunitarias.add(baraja.repartirCarta());
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
-        // RIVER
+        // River
         apuestas = new int[n];
         comunitarias.add(baraja.repartirCarta());
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
         if (terminoMano(pozo, jugadores)) return;
 
-        // SHOWDOWN
+        // Showdown
         showdown(jugadores, comunitarias, pozo);
     }
 
+    // Determina si la mano terminó
     private static boolean terminoMano(int[] pozo, List<Jugador> jugadores) {
         int activos = 0;
         for (Jugador j : jugadores) {
@@ -104,6 +106,7 @@ public class Poker {
         return activos <= 1 || pozo[0] == 0;
     }
 
+    // Método que muestra las manos y determina el ganador
     private static void showdown(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, int[] pozo) {
         Jugador ganador = null;
         String mejorMano = "";
@@ -113,6 +116,7 @@ public class Poker {
             if (jugador.isEnJuego()) jugadoresEnJuego.add(jugador);
         }
 
+        // Evalúa las manos de todos los jugadores activos y muestra sus jugadas
         for (Jugador jugador : jugadoresEnJuego) {
             EvaluarManos.ResultadoEvaluacion resultado = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
             String mano = resultado.nombreJugada;
@@ -133,6 +137,7 @@ public class Poker {
             }
         }
 
+        // Comprueba el empate y reparte las fichas
         if (ganador != null) {
             boolean empate = false;
             for (Jugador jugador : jugadoresEnJuego) {

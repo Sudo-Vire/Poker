@@ -2,12 +2,15 @@
   <dictionary name="project">
     <words>
       <w>accion</w>
+      <w>actuo</w>
       <w>aspr</w>
       <w>combinacion</w>
       <w>comparacion</w>
       <w>configuración</w>
       <w>evaluacion</w>
       <w>hold'em</w>
+      <w>manejador</w>
+      <w>numerico</w>
     </words>
   </dictionary>
 </component>
