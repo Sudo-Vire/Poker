@@ -33,8 +33,8 @@ public class Poker {
         while (true) {
             Interfaz.mostrarMensaje("Comenzando la mano número: " + manoActual);
             apuesta.mostrarCiegasActuales();
-            jugarMano(jugadores, baraja, apuesta);                          // Se juega la mano completa
-            apuesta.rotarPosiciones(jugadores);                             // Se rota dealer/ciegas para la siguiente mano
+            jugarMano(jugadores, baraja, apuesta);                         // Se juega la mano completa
+            apuesta.rotarPosiciones(jugadores);                            // Rota dealer/ciegas para la siguiente mano
 
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
@@ -83,6 +83,7 @@ public class Poker {
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
         }
+        mostrarCartasComunitarias(comunitarias, "Flop");
         if (!finalizarPorAllIn) {
             apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
             finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
@@ -91,6 +92,7 @@ public class Poker {
         // Turn
         Arrays.fill(apuestas, 0);
         comunitarias.add(baraja.repartirCarta());
+        mostrarCartasComunitarias(comunitarias, "Turn");
         if (!finalizarPorAllIn) {
             apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
             finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
@@ -99,26 +101,28 @@ public class Poker {
         // River
         Arrays.fill(apuestas, 0);
         comunitarias.add(baraja.repartirCarta());
+        mostrarCartasComunitarias(comunitarias, "River");
         if (!finalizarPorAllIn) {
             apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
-            finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
         }
 
-        /*
-         * Independientemente del estado, SIEMPRE enseñamos showdown y todas las cartas comunitarias.
-         */
         showdown(jugadores, comunitarias, pozo);
-
-        /*
-         * BLOQUE NUEVO:
-         * Mostrar el saldo de todos los jugadores y el líder tras cada mano.
-         */
         mostrarResumenManoFinal(jugadores);
     }
 
-    /**
-     * Devuelve true si todos los jugadores activos están all-in, o solo queda uno activo.
-     */
+    // Muestra las cartas comunitarias de la ronda actual
+    private static void mostrarCartasComunitarias(List<Baraja.Carta> comunitarias, String fase) {
+        StringBuilder mensaje = new StringBuilder(fase + ": ");
+        for (Baraja.Carta carta : comunitarias) {
+            mensaje.append(carta.toString()).append(" | ");
+        }
+        if (!comunitarias.isEmpty()) {
+            mensaje.setLength(mensaje.length() - 3);
+        }
+        Interfaz.mostrarMensaje(mensaje.toString());
+    }
+
+    // Devuelve true si todos los jugadores activos están all-in, o solo queda uno activo
     private static boolean todosAllInOSoloUnoActivo(List<Jugador> jugadores) {
         int activos = 0;
         boolean alguienPuedeApostar = false;
@@ -135,9 +139,7 @@ public class Poker {
         return activos <= 1;
     }
 
-    /**
-     * Muestra el ganador de la mano y el saldo final de todos los jugadores.
-     */
+    // Muestra el ganador de la mano y el saldo final de todos los jugadores
     private static void mostrarResumenManoFinal(List<Jugador> jugadores) {
         // Busca el jugador con más fichas después del showdown
         Jugador maxJugador = null;
@@ -194,7 +196,7 @@ public class Poker {
             boolean empate = false;
             for (Jugador jugador : jugadoresEnJuego) {
                 if (jugador != ganador) {
-                    String manoJugador = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias).toString();
+                    String manoJugador = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias).nombreJugada;
                     if (CompararManos.compararManos(mejorMano, manoJugador, ganador.getMano(), jugador.getMano(), comunitarias) == 0) {
                         empate = true;
                         break;
