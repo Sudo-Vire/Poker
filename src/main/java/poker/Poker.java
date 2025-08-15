@@ -1,6 +1,7 @@
 package poker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // Clase principal del programa Poker Texas Hold'em
@@ -34,6 +35,7 @@ public class Poker {
             apuesta.mostrarCiegasActuales();
             jugarMano(jugadores, baraja, apuesta);                          // Se juega la mano completa
             apuesta.rotarPosiciones(jugadores);                             // Se rota dealer/ciegas para la siguiente mano
+
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
             if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego
@@ -66,44 +68,99 @@ public class Poker {
         }
         apuesta.ponerCiegas(jugadores, pozo, apuestas);
 
+        boolean finalizarPorAllIn = false;
+
         // Pre-Flop
         int primerJugadorPreFlop = (jugadores.size() == 2)
                 ? apuesta.getSmallBlindIndex()
                 : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
-        if (terminoMano(pozo, jugadores)) return; // Sale si solo queda un jugador
+
+        /*
+         * BLOQUE NUEVO:
+         * Comprobamos después de la ronda si todos los jugadores han apostado todo su saldo (ALL-IN)
+         * o sólo queda un jugador, para decidir si finalizamos el betting y vamos directo al showdown.
+         */
+        finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
 
         // Flop
-        apuestas = new int[n];
+        Arrays.fill(apuestas, 0);
         for (int i = 0; i < 3; i++) {
             comunitarias.add(baraja.repartirCarta());
         }
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
-        if (terminoMano(pozo, jugadores)) return;
+        if (!finalizarPorAllIn) {
+            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
+            finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
+        }
 
         // Turn
-        apuestas = new int[n];
+        Arrays.fill(apuestas, 0);
         comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
-        if (terminoMano(pozo, jugadores)) return;
+        if (!finalizarPorAllIn) {
+            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
+            finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
+        }
 
         // River
-        apuestas = new int[n];
+        Arrays.fill(apuestas, 0);
         comunitarias.add(baraja.repartirCarta());
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
-        if (terminoMano(pozo, jugadores)) return;
+        if (!finalizarPorAllIn) {
+            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
+            finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
+        }
 
-        // Showdown
+        /*
+         * Independientemente del estado, SIEMPRE enseñamos showdown y todas las cartas comunitarias.
+         */
         showdown(jugadores, comunitarias, pozo);
+
+        /*
+         * BLOQUE NUEVO:
+         * Mostrar el saldo de todos los jugadores y el líder tras cada mano.
+         */
+        mostrarResumenManoFinal(jugadores);
     }
 
-    // Determina si la mano terminó
-    private static boolean terminoMano(int[] pozo, List<Jugador> jugadores) {
+    /**
+     * Devuelve true si todos los jugadores activos están all-in, o solo queda uno activo.
+     */
+    private static boolean todosAllInOSoloUnoActivo(List<Jugador> jugadores) {
         int activos = 0;
+        boolean alguienPuedeApostar = false;
         for (Jugador j : jugadores) {
-            if (j.isEnJuego() && j.getSaldo() > 0) activos++;
+            if (j.isEnJuego()) {
+                if (!j.isVaAllIn() && j.getSaldo() > 0) {
+                    alguienPuedeApostar = true; // Hay alguien que todavía puede apostar
+                }
+                activos++;
+            }
         }
-        return activos <= 1 || pozo[0] == 0;
+        if (!alguienPuedeApostar) return true;
+        // Si solo queda uno activo la mano se termina automáticamente también
+        return activos <= 1;
+    }
+
+    /**
+     * Muestra el ganador de la mano y el saldo final de todos los jugadores.
+     */
+    private static void mostrarResumenManoFinal(List<Jugador> jugadores) {
+        // Busca el jugador con más fichas después del showdown
+        Jugador maxJugador = null;
+        int maxFichas = -1;
+        for (Jugador j : jugadores) {
+            if (j.getSaldo() > maxFichas) {
+                maxFichas = j.getSaldo();
+                maxJugador = j;
+            }
+        }
+        if (maxJugador != null) {
+            Interfaz.mostrarMensaje("El jugador con más fichas tras la mano es: " + maxJugador.getNombre() + " (" + maxJugador.getSaldo() + " fichas)");
+        }
+        Interfaz.mostrarMensaje("---- Saldo de todos los jugadores tras la mano ----");
+        for (Jugador jugador : jugadores) {
+            Interfaz.mostrarMensaje(jugador.getNombre() + ": " + jugador.getSaldo() + " fichas");
+        }
+        Interfaz.mostrarMensaje("---------------------------------------------");
     }
 
     // Método que muestra las manos y determina el ganador

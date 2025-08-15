@@ -69,12 +69,14 @@ public class Interfaz {
             Interfaz.mostrarMensaje("Opciones:");
             Interfaz.mostrarMensaje("1) Igualar (" + cantidadPorIgualar + ")");
             Interfaz.mostrarMensaje("2) Subir");
-            Interfaz.mostrarMensaje("3) Retirarse");
+            Interfaz.mostrarMensaje("3) All-in");
+            Interfaz.mostrarMensaje("4) Retirarse");
         } else {
             Interfaz.mostrarMensaje("Opciones:");
             Interfaz.mostrarMensaje("1) Pasar");
             Interfaz.mostrarMensaje("2) Apostar");
-            Interfaz.mostrarMensaje("3) Retirarse");
+            Interfaz.mostrarMensaje("3) All-in");
+            Interfaz.mostrarMensaje("4) Retirarse");
         }
         String jugada = Interfaz.leerLinea().toLowerCase(); // Lee la opción elegida
 
@@ -92,22 +94,41 @@ public class Interfaz {
         } else if ((jugada.equals("apostar") || jugada.equals("2")) && cantidadPorIgualar == 0) {
             // Hacer apuesta inicial en la ronda
             int minApuesta = (fase.equals("Pre-Flop")) ? bigBlindAmount : 1;
-            int cantidad = Interfaz.leerNumero("¿Cuánto quieres apostar? (min " + minApuesta + "): ", minApuesta, jugador.getSaldo());
+            int maxApuesta = jugador.getSaldo() - 1;
+            int cantidad = Interfaz.leerNumero("¿Cuánto quieres apostar? (min " + minApuesta + ", max " + (maxApuesta + 1) + "): ", minApuesta, maxApuesta);
             jugador.setSaldo(jugador.getSaldo() - cantidad);
             pozo[0] += cantidad;
             apuestas[indiceJugador] += cantidad;
-            apuestaActual[0] = cantidad; // Marca la nueva apuesta actual a igualar
+            apuestaActual[0] = cantidad;
             accionValida = true;
         } else if ((jugada.equals("subir") || jugada.equals("2")) && cantidadPorIgualar > 0) {
             // Subir la apuesta
-            int minSubida = (fase.equals("Pre-Flop")) ? Math.max(cantidadPorIgualar + bigBlindAmount, cantidadPorIgualar + 1) : cantidadPorIgualar + 1;
-            int cantidad = Interfaz.leerNumero("¿Cuánto quieres subir? (min " + minSubida + "): ", minSubida, jugador.getSaldo());
-            jugador.setSaldo(jugador.getSaldo() - cantidad);
+            int minExtra = 1;
+            int maxExtra = jugador.getSaldo() - cantidadPorIgualar - 1;
+
+            if (maxExtra < minExtra) {
+                Interfaz.mostrarMensaje("No tienes saldo suficiente para subir. Solo puedes igualar o retirarte.");
+            } else {
+                int subida = Interfaz.leerNumero(
+                        "¿Cuánto fichas extra quieres subir? (min " + minExtra + ", max " + (maxExtra - 1) + "): ",
+                        minExtra, maxExtra
+                );
+
+                int totalAPagar = cantidadPorIgualar + subida;
+                jugador.setSaldo(jugador.getSaldo() - totalAPagar);
+                pozo[0] += totalAPagar;
+                apuestas[indiceJugador] += totalAPagar;
+                apuestaActual[0] = apuestas[indiceJugador];
+                accionValida = true;
+            }
+        } else if ((jugada.equals("all-in") || jugada.equals("3"))) {
+            int cantidad = jugador.getSaldo();
+            jugador.setSaldo(0);
             pozo[0] += cantidad;
-            apuestas[indiceJugador] += cantidadPorIgualar + (cantidad - cantidadPorIgualar);
-            apuestaActual[0] = apuestas[indiceJugador];
+            apuestas[indiceJugador] += cantidad;
+            jugador.setVaAllIn(true); //
             accionValida = true;
-        } else if (jugada.equals("retirarse") || jugada.equals("3")) {
+        } else if (jugada.equals("retirarse") || jugada.equals("4")) {
             // El jugador se retira de la mano: ya no participa hasta la siguiente ronda
             jugador.enJuego = false;
             accionValida = true;
@@ -117,12 +138,12 @@ public class Interfaz {
             int indiceRestante = -1;
             int n = jugadores.size();
             for (int x = 0; x < n; x++) {
-                if (jugadores.get(x).isEnJuego() && jugadores.get(x).getSaldo() > 0) {
+                if (jugadores.get(x).isEnJuego() && (jugadores.get(x).getSaldo() > 0 || jugadores.get(x).isVaAllIn())) {
                     jugadoresActivosRestantes++;
                     indiceRestante = x;
                 }
             }
-            if (jugadoresActivosRestantes == 1) {
+            if (jugadoresActivosRestantes == 1 && !jugadores.get(indiceRestante).isVaAllIn()) {
                 Jugador ganador = jugadores.get(indiceRestante);
                 Interfaz.mostrarMensaje("Todos los demás jugadores se han retirado.");
                 Interfaz.mostrarMensaje(ganador.getNombre() + " gana la mano y se lleva " + pozo[0] + " fichas.");

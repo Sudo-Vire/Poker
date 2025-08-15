@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Apuesta {
-    // Variables estáticas para las ciegas y el contador de manos
-    private static int smallBlind;
-    private static int bigBlind;
-    private static int contadorManos;
-
-    // Índices para dealer, small blind y big blind en la lista de jugadores
+    private static int smallBlind; // Valor ciega pequeña
+    private static int bigBlind; // Valor ciega grande
+    private static int contadorManos; // Manos para aumentar las ciegas
+    // Índices para calcular la posición del dealer y las ciegas
     private int dealerIndex;
     private int smallBlindIndex;
     private int bigBlindIndex;
@@ -34,9 +32,7 @@ public class Apuesta {
         return bigBlindIndex;
     }
 
-    /**
-     * Asigna las posiciones iniciales de dealer, small blind y big blind en la lista de jugadores.
-     */
+    // Asigna las posiciones iniciales del dealer y de las ciegas
     public void asignarPosicionesIniciales(List<Jugador> jugadores) {
         if (jugadores.size() < 2) {
             throw new IllegalStateException("No hay suficientes jugadores para asignar posiciones.");
@@ -48,9 +44,7 @@ public class Apuesta {
         Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la Ciega Grande.");
     }
 
-    /**
-     * Rota las posiciones de dealer, small blind y big blind para la siguiente mano.
-     */
+    // Rota las posiciones iniciales del dealer y de las ciegas
     public void rotarPosiciones(List<Jugador> jugadores) {
         if (jugadores.size() < 2) {
             throw new IllegalStateException("No hay suficientes jugadores para rotar posiciones.");
@@ -62,9 +56,7 @@ public class Apuesta {
         Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la nueva Ciega Grande.");
     }
 
-    /**
-     * Descuenta las ciegas a los jugadores correspondientes y suma al pozo.
-     */
+    // Descuenta las ciegas a los jugadores correspondientes y suma al pozo.
     public void ponerCiegas(List<Jugador> jugadores, int[] pozo, int[] apuestas) {
         // Ciega pequeña
         if (smallBlindIndex >= 0 && smallBlindIndex < jugadores.size()) {
@@ -90,16 +82,12 @@ public class Apuesta {
         }
     }
 
-    /**
-     * Muestra los valores actuales de las ciegas.
-     */
+    // Muestra los valores actuales de las ciegas
     public void mostrarCiegasActuales() {
         Interfaz.mostrarMensaje("Ciega pequeña actual: " + smallBlind + ", Ciega grande actual: " + bigBlind);
     }
 
-    /**
-     * Aumenta las ciegas cada cierto número fijo de manos.
-     */
+    // Aumenta las ciegas cada cierto número fijo de manos.
     public static void aumentarCiegas() {
         contadorManos++;
         int manosParaAumentarCiegas = 3;
@@ -110,28 +98,27 @@ public class Apuesta {
         }
     }
 
-    /**
-     * Controla la ronda de apuestas de acuerdo a la fase actual del juego.
-     */
+    // Controla la ronda de apuestas de acuerdo a la fase actual del juego.
     public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase, int primerJugador, int[] apuestas) {
         int n = jugadores.size();
         int[] apuestaActual = new int[1];
         apuestaActual[0] = (fase.equals("Pre-Flop")) ? bigBlind : 0;
 
-        boolean huboApuestaOSubida = false;
         boolean[] yaActuo = new boolean[n];
         int jugadoresActivos;
 
+        boolean todosIgualaron;
+
         do {
+            todosIgualaron = true;
+
             for (int offset = 0; offset < n; offset++) {
                 int i = (primerJugador + offset) % n;
                 Jugador jugador = jugadores.get(i);
 
-                if (!jugador.isEnJuego() || jugador.getSaldo() <= 0) continue;
+                if (!jugador.isEnJuego() || jugador.isVaAllIn() || jugador.getSaldo() <= 0) continue;
 
-                // Control en Pre-Flop y fases posteriores según reglas de turnos
-                if (fase.equals("Pre-Flop") && apuestas[i] == apuestaActual[0] && apuestaActual[0] != 0 && yaActuo[i]) continue;
-                if (!fase.equals("Pre-Flop") && yaActuo[i]) continue;
+                if ((apuestas[i] == apuestaActual[0] || jugador.isVaAllIn()) && yaActuo[i]) continue;
 
                 mostrarCartasComunitarias(comunitarias, fase);
                 jugador.mostrarMano();
@@ -142,7 +129,7 @@ public class Apuesta {
                 int cantidadPorIgualar = apuestaActual[0] - apuestas[i];
                 boolean accionValida = false;
 
-                // Espera a que el jugador haga una acción válida (apostar, igualar, subir, retirarse)
+                // Espera a que el jugador haga una acción válida (apostar, igualar, subir, retirarse, all-in)
                 while (!accionValida) {
                     int apuestaPrev = apuestaActual[0];
                     accionValida = Interfaz.aspr(jugador, cantidadPorIgualar, pozo, apuestas, i, apuestaActual, jugadores, fase, bigBlind);
@@ -150,30 +137,44 @@ public class Apuesta {
                         return; // La ronda termina si todos, menos uno, se retiran
                     }
                     if (apuestaActual[0] > apuestaPrev) {
-                        huboApuestaOSubida = true;
-                        Arrays.fill(yaActuo, false); // Reinicia los turnos si alguien sube la apuesta
+                        Arrays.fill(yaActuo, false);
+                        yaActuo[i] = true;
+                        todosIgualaron = false;
                     }
                 }
                 yaActuo[i] = true;
+
+                if (jugador.isEnJuego() && apuestas[i] < apuestaActual[0] && jugador.getSaldo() > 0 && !jugador.isVaAllIn()) {
+                    todosIgualaron = false;
+                }
             }
+
             // Cuenta el número de jugadores activos para la ronda
             jugadoresActivos = 0;
             for (int i = 0; i < n; i++) {
-                if (jugadores.get(i).isEnJuego() && jugadores.get(i).getSaldo() > 0) {
+                if (jugadores.get(i).isEnJuego() && (jugadores.get(i).getSaldo() > 0 || jugadores.get(i).isVaAllIn())) {
                     jugadoresActivos++;
                 }
             }
-        } while ((huboApuestaOSubida && jugadoresActivos > 1) || !todosHanActuado(yaActuo, jugadores));
-    }
 
-    // Verifica que todos los jugadores activos hayan actuado en la ronda.
-    private boolean todosHanActuado(boolean[] yaActuo, List<Jugador> jugadores) {
-        for (int i = 0; i < jugadores.size(); i++) {
-            if (jugadores.get(i).isEnJuego() && jugadores.get(i).getSaldo() > 0) {
-                if (!yaActuo[i]) return false;
+            if (todosIgualaron) {
+                boolean todosActuaron = true;
+                for (int i = 0; i < n; i++) {
+                    Jugador j = jugadores.get(i);
+                    if (j.isEnJuego() && j.getSaldo() > 0 && !j.isVaAllIn()) {
+                        if (apuestas[i] < apuestaActual[0]) {
+                            todosIgualaron = false;
+                            break;
+                        }
+                        if (!yaActuo[i]) {
+                            todosActuaron = false;
+                        }
+                    }
+                }
+                if (todosIgualaron && todosActuaron) break;
             }
-        }
-        return true;
+
+        } while (jugadoresActivos > 1 && !todosIgualaron);
     }
 
     // Muestra por consola las cartas comunitarias y en qué fase están.

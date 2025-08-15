@@ -9,14 +9,16 @@ public class Jugador {
     private int saldo;                                 // Saldo actual
     boolean enJuego;                                   // En true mientras está en la mano, false solo si se retira
     private boolean haApostado;                        // Indica si ya ha apostado en la ronda
+    private boolean vaAllIn;                           // Indica si el jugador está haciendo All-In
 
-   // Setter de jugador que importa algunos valores e inicializa otros
+    // Setter de jugador que importa algunos valores e inicializa otros
     public Jugador(String nombre, int saldoInicial) {
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.saldo = saldoInicial;
         this.enJuego = true;
         this.haApostado = false;
+        this.vaAllIn = false;
     }
 
     // Agrega una carta a la mano del jugador.
@@ -47,6 +49,7 @@ public class Jugador {
         mano.clear();
         enJuego = true;
         haApostado = false;
+        vaAllIn = false;
     }
 
     // Getters y Setters varios
@@ -54,10 +57,15 @@ public class Jugador {
     public void setSaldo(int saldo) {
         if (saldo < 0) throw new IllegalArgumentException("El saldo no puede ser negativo");
         this.saldo = saldo;
+        if (saldo == 0 && enJuego) {
+            vaAllIn = true;
+        }
     }
     public String getNombre() { return nombre; }
     public boolean isEnJuego() { return enJuego; }
     public List<Baraja.Carta> getMano() { return new ArrayList<>(mano); }
     public boolean isHaApostado() { return haApostado; }
     public void setHaApostado(boolean haApostado) { this.haApostado = haApostado; }
+    public boolean isVaAllIn() { return vaAllIn; }  // GETTER PARA ALL-IN
+    public void setVaAllIn(boolean vaAllIn) { this.vaAllIn = vaAllIn; }  // SETTER PARA ALL-IN
 }
