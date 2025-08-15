@@ -129,7 +129,7 @@ public class Poker {
         for (Jugador j : jugadores) {
             if (j.isEnJuego()) {
                 if (!j.isVaAllIn() && j.getSaldo() > 0) {
-                    alguienPuedeApostar = true; // Hay alguien que todavía puede apostar
+                    alguienPuedeApostar = true;
                 }
                 activos++;
             }
