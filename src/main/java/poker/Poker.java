@@ -68,7 +68,7 @@ public class Poker {
         }
         apuesta.ponerCiegas(jugadores, pozo, apuestas);
 
-        boolean finalizarPorAllIn = false;
+        boolean finalizarPorAllIn;
 
         // Pre-Flop
         int primerJugadorPreFlop = (jugadores.size() == 2)
@@ -76,11 +76,6 @@ public class Poker {
                 : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
         apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
 
-        /*
-         * BLOQUE NUEVO:
-         * Comprobamos después de la ronda si todos los jugadores han apostado todo su saldo (ALL-IN)
-         * o sólo queda un jugador, para decidir si finalizamos el betting y vamos directo al showdown.
-         */
         finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
 
         // Flop
