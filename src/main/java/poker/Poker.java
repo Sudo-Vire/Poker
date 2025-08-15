@@ -204,7 +204,7 @@ public class Poker {
                 }
             }
 
-            // En caso de mpate lo muestra, sino dice el ganador
+            // En caso de empate lo muestra, sino dice el ganador
             if (empate) {
                 Interfaz.mostrarMensaje("Empate. Las fichas del pozo se devuelven a los jugadores.");
                 int fichasPorJugador = pozo[0] / jugadoresEnJuego.size();
