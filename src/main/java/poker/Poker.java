@@ -159,8 +159,7 @@ public class Poker {
         }
         Interfaz.mostrarMensaje("---------------------------------------------");
     }
-
-    // Método que muestra las manos y determina el ganador
+    
     // Método que muestra las manos y determina el ganador
     private static void showdown(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, int[] pozo) {
         Jugador ganador;
