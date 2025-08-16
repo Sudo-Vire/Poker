@@ -180,7 +180,7 @@ public class EvaluarManos {
         return mano.stream().collect(Collectors.groupingBy(c -> c.valorNumerico));
     }
 
-    // Asocia un valor jerárquico a cada tipo de jugada
+    // Asocia un valor numérico a cada tipo de jugada
     static int obtenerValorMano(String nombre) {
         return switch (nombre) {
             case "Escalera Real" -> 10;

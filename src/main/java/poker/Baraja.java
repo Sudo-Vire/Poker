@@ -33,7 +33,7 @@ public class Baraja {
         barajar();
     }
 
-    // Método privado para barajar las cartas y reiniciar el índice
+    // Método privado para barajar las cartas y reiniciar el índice de jugador
     private void barajar() {
         Collections.shuffle(cartas);
         indice = 0;
