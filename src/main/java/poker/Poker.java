@@ -161,13 +161,17 @@ public class Poker {
     }
 
     // Método que muestra las manos y determina el ganador
+    // Método que muestra las manos y determina el ganador
     private static void showdown(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, int[] pozo) {
-        Jugador ganador = null;
-        String mejorMano = "";
+        Jugador ganador;
 
         List<Jugador> jugadoresEnJuego = new ArrayList<>();
+        List<String> nombresMano = new ArrayList<>();
+        List<List<Baraja.Carta>> combinacionesPrincipales = new ArrayList<>();
+
         for (Jugador jugador : jugadores) {
-            if (jugador.isEnJuego()) jugadoresEnJuego.add(jugador);
+            if (jugador.isEnJuego())
+                jugadoresEnJuego.add(jugador);
         }
 
         // Evalúa las manos de todos los jugadores activos y muestra sus jugadas
@@ -175,6 +179,9 @@ public class Poker {
             EvaluarManos.ResultadoEvaluacion resultado = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
             String mano = resultado.nombreJugada;
             List<Baraja.Carta> mejores5Cartas = resultado.cartasPrincipales;
+
+            nombresMano.add(mano);
+            combinacionesPrincipales.add(mejores5Cartas);
 
             Interfaz.mostrarMensaje(jugador.getNombre() + " tiene: " + mano);
 
@@ -184,27 +191,36 @@ public class Poker {
             }
             Interfaz.mostrarMensaje(cartasEnLinea.toString());
             Interfaz.mostrarMensaje("");
+        }
 
-            if (ganador == null || CompararManos.compararManos(mano, mejorMano, jugador.getMano(), ganador.getMano(), comunitarias) > 0) {
-                ganador = jugador;
-                mejorMano = mano;
+        // Determinar ganador correctamente
+        int idxGanador = -1;
+        Jugador posibleGanador = null;
+        for (int idxActual = 0; idxActual < jugadoresEnJuego.size(); idxActual++) {
+            if (idxGanador == -1 || CompararManos.compararManos2(
+                    combinacionesPrincipales.get(idxActual), nombresMano.get(idxActual),
+                    combinacionesPrincipales.get(idxGanador), nombresMano.get(idxGanador)
+            ) > 0) {
+                idxGanador = idxActual;
+                posibleGanador = jugadoresEnJuego.get(idxActual);
+            }
+        }
+        ganador = posibleGanador;
+
+        // Comprueba el empate y reparte las fichas
+        boolean empate = false;
+        for (int i = 0; i < jugadoresEnJuego.size(); i++) {
+            if (i == idxGanador) continue;
+            if (CompararManos.compararManos2(
+                    combinacionesPrincipales.get(i), nombresMano.get(i),
+                    combinacionesPrincipales.get(idxGanador), nombresMano.get(idxGanador)
+            ) == 0) {
+                empate = true;
+                break;
             }
         }
 
-        // Comprueba el empate y reparte las fichas
         if (ganador != null) {
-            boolean empate = false;
-            for (Jugador jugador : jugadoresEnJuego) {
-                if (jugador != ganador) {
-                    String manoJugador = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias).nombreJugada;
-                    if (CompararManos.compararManos(mejorMano, manoJugador, ganador.getMano(), jugador.getMano(), comunitarias) == 0) {
-                        empate = true;
-                        break;
-                    }
-                }
-            }
-
-            // En caso de empate lo muestra, sino dice el ganador
             if (empate) {
                 Interfaz.mostrarMensaje("Empate. Las fichas del pozo se devuelven a los jugadores.");
                 int fichasPorJugador = pozo[0] / jugadoresEnJuego.size();
@@ -213,7 +229,7 @@ public class Poker {
                 }
                 pozo[0] = 0;
             } else {
-                Interfaz.mostrarMensaje(ganador.getNombre() + " gana con " + mejorMano + " y se lleva " + pozo[0] + " fichas.");
+                Interfaz.mostrarMensaje(ganador.getNombre() + " gana con " + nombresMano.get(idxGanador) + " y se lleva " + pozo[0] + " fichas.");
                 ganador.ganar(pozo[0]);
             }
         } else {
