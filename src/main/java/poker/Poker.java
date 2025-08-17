@@ -36,6 +36,25 @@ public class Poker {
             jugarMano(jugadores, baraja, apuesta);                         // Se juega la mano completa
             apuesta.rotarPosiciones(jugadores);                            // Rota dealer/ciegas para la siguiente mano
 
+            // --- ELIMINAR Y NOTIFICAR ELIMINADOS AL FINAL DE LA MANO ---
+            List<Jugador> eliminados = jugadores.stream().filter(j -> j.getSaldo() <= 0).toList();
+            if (!eliminados.isEmpty()) {
+                for (Jugador eliminado : eliminados) {
+                    Interfaz.mostrarMensaje("El jugador " + eliminado.getNombre() + " ha sido eliminado.");
+                }
+            }
+            jugadores.removeIf(j -> j.getSaldo() <= 0);
+
+            // Si solo queda uno, termina el juego
+            if (jugadores.size() == 1) {
+                Interfaz.mostrarMensaje("¡" + jugadores.get(0).getNombre() + " es el ganador del torneo! ¡Enhorabuena!");
+                break;
+            }
+            if (jugadores.isEmpty()) {
+                Interfaz.mostrarMensaje("No quedan jugadores, termina el torneo.");
+                break;
+            }
+
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
             if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego

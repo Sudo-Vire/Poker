@@ -52,8 +52,6 @@ public class Apuesta {
         dealerIndex = (dealerIndex + 1) % jugadores.size();
         smallBlindIndex = (dealerIndex + 1) % jugadores.size();
         bigBlindIndex = (dealerIndex + 2) % jugadores.size();
-        Interfaz.mostrarMensaje(jugadores.get(smallBlindIndex).getNombre() + " es la nueva Ciega Pequeña.");
-        Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la nueva Ciega Grande.");
     }
 
     // Descuenta las ciegas a los jugadores correspondientes y suma al pozo.
