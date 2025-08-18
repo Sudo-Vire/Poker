@@ -3,6 +3,7 @@ package poker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Comparator;
 
 // Clase principal del programa Poker Texas Hold'em
 public class Poker {
@@ -12,7 +13,7 @@ public class Poker {
         int smallBlind = 10;                                                          // Cantidad para la ciega pequeña inicial
         int bigBlind = 20;                                                            // Cantidad para la ciega grande inicial
         int manosParaAumentarCiegas = 3;                                              // Tras cuántas manos se doblan las ciegas
-        Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas); // Manejador de apuestas y ciegas
+        Apuesta apuesta = new Apuesta(smallBlind, bigBlind, manosParaAumentarCiegas); // Manejador de apuestas, ciegas y side pots
         Baraja baraja = new Baraja();                                                 // Baraja del juego
         List<Jugador> jugadores = new ArrayList<>();                                  // Lista de jugadores
 
@@ -36,7 +37,6 @@ public class Poker {
             jugarMano(jugadores, baraja, apuesta);                         // Se juega la mano completa
             apuesta.rotarPosiciones(jugadores);                            // Rota dealer/ciegas para la siguiente mano
 
-            // --- ELIMINAR Y NOTIFICAR ELIMINADOS AL FINAL DE LA MANO ---
             List<Jugador> eliminados = jugadores.stream().filter(j -> j.getSaldo() <= 0).toList();
             if (!eliminados.isEmpty()) {
                 for (Jugador eliminado : eliminados) {
@@ -59,6 +59,10 @@ public class Poker {
             String respuesta = Interfaz.leerLinea();
             if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego
                 break;
+            } else if (!respuesta.equalsIgnoreCase("n")) {
+                continue;
+            } else {
+                Interfaz.mostrarMensaje("Introduce una opción válida");
             }
             manoActual++;
         }
@@ -70,11 +74,12 @@ public class Poker {
 
         Interfaz.cerrarScanner();
     }
+    
+    
 
     // Ejecuta el ciclo completo de una mano
     private static void jugarMano(List<Jugador> jugadores, Baraja baraja, Apuesta apuesta) {
         List<Baraja.Carta> comunitarias = new ArrayList<>();    // Cartas comunitarias en la mesa
-        int[] pozo = {0};                                       // Pozo de fichas por mano
         int n = jugadores.size();
         int[] apuestas = new int[n];                            // Rastrea las apuestas individuales en cada ronda
 
@@ -85,7 +90,9 @@ public class Poker {
             jugador.recibirCarta(baraja.repartirCarta());
             Interfaz.limpiarPantalla();
         }
-        apuesta.ponerCiegas(jugadores, pozo, apuestas);
+
+        // --- MODIFICADO: ahora las ciegas van al sistema de Side Pots ---
+        apuesta.ponerCiegas(jugadores, apuestas);
 
         boolean finalizarPorAllIn;
 
@@ -93,7 +100,7 @@ public class Poker {
         int primerJugadorPreFlop = (jugadores.size() == 2)
                 ? apuesta.getSmallBlindIndex()
                 : (apuesta.getBigBlindIndex() + 1) % jugadores.size();
-        apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
+        apuesta.realizarRondaApuestas(jugadores, comunitarias, "Pre-Flop", primerJugadorPreFlop, apuestas);
 
         finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
 
@@ -104,7 +111,7 @@ public class Poker {
         }
         mostrarCartasComunitarias(comunitarias, "Flop");
         if (!finalizarPorAllIn) {
-            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
+            apuesta.realizarRondaApuestas(jugadores, comunitarias, "Flop", apuesta.getSmallBlindIndex(), apuestas);
             finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
         }
 
@@ -113,7 +120,7 @@ public class Poker {
         comunitarias.add(baraja.repartirCarta());
         mostrarCartasComunitarias(comunitarias, "Turn");
         if (!finalizarPorAllIn) {
-            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
+            apuesta.realizarRondaApuestas(jugadores, comunitarias, "Turn", apuesta.getSmallBlindIndex(), apuestas);
             finalizarPorAllIn = todosAllInOSoloUnoActivo(jugadores);
         }
 
@@ -122,10 +129,11 @@ public class Poker {
         comunitarias.add(baraja.repartirCarta());
         mostrarCartasComunitarias(comunitarias, "River");
         if (!finalizarPorAllIn) {
-            apuesta.realizarRondaApuestas(jugadores, pozo, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
+            apuesta.realizarRondaApuestas(jugadores, comunitarias, "River", apuesta.getSmallBlindIndex(), apuestas);
         }
 
-        showdown(jugadores, comunitarias, pozo);
+        // --- MODIFICADO: showdown ahora utiliza la lista de side pots ---
+        showdown(comunitarias, apuesta.getPots());
         mostrarResumenManoFinal(jugadores);
     }
 
@@ -158,20 +166,15 @@ public class Poker {
         return activos <= 1;
     }
 
-    // Muestra el ganador de la mano y el saldo final de todos los jugadores
+    // Muestra el jugador con más fichas tras la mano y los saldos actuales
     private static void mostrarResumenManoFinal(List<Jugador> jugadores) {
-        // Busca el jugador con más fichas después del showdown
-        Jugador maxJugador = null;
-        int maxFichas = -1;
-        for (Jugador j : jugadores) {
-            if (j.getSaldo() > maxFichas) {
-                maxFichas = j.getSaldo();
-                maxJugador = j;
-            }
-        }
-        if (maxJugador != null) {
-            Interfaz.mostrarMensaje("El jugador con más fichas tras la mano es: " + maxJugador.getNombre() + " (" + maxJugador.getSaldo() + " fichas)");
-        }
+        // --- MODIFICADO: usar streams para evitar warnings sobre maxJugador ---
+        jugadores.stream()
+                .max(Comparator.comparingInt(Jugador::getSaldo))
+                .ifPresent(maxJugador ->
+                        Interfaz.mostrarMensaje("El jugador con más fichas tras la mano es: "
+                                + maxJugador.getNombre() + " (" + maxJugador.getSaldo() + " fichas)"));
+
         Interfaz.mostrarMensaje("---- Saldo de todos los jugadores tras la mano ----");
         for (Jugador jugador : jugadores) {
             Interfaz.mostrarMensaje(jugador.getNombre() + ": " + jugador.getSaldo() + " fichas");
@@ -179,80 +182,71 @@ public class Poker {
         Interfaz.mostrarMensaje("---------------------------------------------");
     }
 
-    // Método que muestra las manos y determina el ganador
-    private static void showdown(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, int[] pozo) {
-        Jugador ganador;
+    // --- MODIFICADO: showdown reparte cada side pot y acumula el total ---
+    private static void showdown(List<Baraja.Carta> comunitarias, List<Apuesta.SidePot> pots) {
+        java.util.Map<Jugador, Integer> ganancias = new java.util.HashMap<>();
 
-        List<Jugador> jugadoresEnJuego = new ArrayList<>();
-        List<String> nombresMano = new ArrayList<>();
-        List<List<Baraja.Carta>> combinacionesPrincipales = new ArrayList<>();
+        for (Apuesta.SidePot pot : pots) {
+            List<Jugador> candidatos = new ArrayList<>();
+            List<List<Baraja.Carta>> combinaciones = new ArrayList<>();
+            List<String> nombresJugada = new ArrayList<>();
 
-        for (Jugador jugador : jugadores) {
-            if (jugador.isEnJuego())
-                jugadoresEnJuego.add(jugador);
-        }
+            for (Jugador j : pot.participantes) {
+                if (j.isEnJuego()) {
+                    EvaluarManos.ResultadoEvaluacion res = EvaluarManos.evaluarManoCompleta(j.getMano(), comunitarias);
+                    combinaciones.add(res.cartasPrincipales);
+                    nombresJugada.add(res.nombreJugada);
+                    candidatos.add(j);
 
-        // Evalúa las manos de todos los jugadores activos y muestra sus jugadas
-        for (Jugador jugador : jugadoresEnJuego) {
-            EvaluarManos.ResultadoEvaluacion resultado = EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
-            String mano = resultado.nombreJugada;
-            List<Baraja.Carta> mejores5Cartas = resultado.cartasPrincipales;
+                    Interfaz.mostrarMensaje(j.getNombre() + " juega " + res.nombreJugada);
 
-            nombresMano.add(mano);
-            combinacionesPrincipales.add(mejores5Cartas);
-
-            Interfaz.mostrarMensaje(jugador.getNombre() + " tiene: " + mano);
-
-            StringBuilder cartasEnLinea = new StringBuilder("Cartas usadas: ");
-            for (Baraja.Carta carta : mejores5Cartas) {
-                cartasEnLinea.append(carta.toString()).append(" ");
-            }
-            Interfaz.mostrarMensaje(cartasEnLinea.toString());
-            Interfaz.mostrarMensaje("");
-        }
-
-        // Determinar ganador correctamente
-        int idxGanador = -1;
-        Jugador posibleGanador = null;
-        for (int idxActual = 0; idxActual < jugadoresEnJuego.size(); idxActual++) {
-            if (idxGanador == -1 || CompararManos.compararManos2(
-                    combinacionesPrincipales.get(idxActual), nombresMano.get(idxActual),
-                    combinacionesPrincipales.get(idxGanador), nombresMano.get(idxGanador)
-            ) > 0) {
-                idxGanador = idxActual;
-                posibleGanador = jugadoresEnJuego.get(idxActual);
-            }
-        }
-        ganador = posibleGanador;
-
-        // Comprueba el empate y reparte las fichas
-        boolean empate = false;
-        for (int i = 0; i < jugadoresEnJuego.size(); i++) {
-            if (i == idxGanador) continue;
-            if (CompararManos.compararManos2(
-                    combinacionesPrincipales.get(i), nombresMano.get(i),
-                    combinacionesPrincipales.get(idxGanador), nombresMano.get(idxGanador)
-            ) == 0) {
-                empate = true;
-                break;
-            }
-        }
-
-        if (ganador != null) {
-            if (empate) {
-                Interfaz.mostrarMensaje("Empate. Las fichas del pozo se devuelven a los jugadores.");
-                int fichasPorJugador = pozo[0] / jugadoresEnJuego.size();
-                for (Jugador jugador : jugadoresEnJuego) {
-                    jugador.ganar(fichasPorJugador);
+                    // Mostrar cartas usadas
+                    StringBuilder cartasUsadas = new StringBuilder("Cartas usadas: ");
+                    for (Baraja.Carta carta : res.cartasPrincipales) {
+                        cartasUsadas.append(carta.toString()).append(" ");
+                    }
+                    Interfaz.mostrarMensaje(cartasUsadas.toString());
+                    Interfaz.mostrarMensaje("");
                 }
-                pozo[0] = 0;
-            } else {
-                Interfaz.mostrarMensaje(ganador.getNombre() + " gana con " + nombresMano.get(idxGanador) + " y se lleva " + pozo[0] + " fichas.");
-                ganador.ganar(pozo[0]);
             }
-        } else {
-            Interfaz.mostrarMensaje("No hay ganador en esta mano.");
+
+            if (candidatos.isEmpty()) continue;
+
+            int idxGanador = -1;
+            List<Jugador> ganadores = new ArrayList<>();
+            for (int i = 0; i < candidatos.size(); i++) {
+                if (idxGanador == -1) {
+                    idxGanador = i;
+                    ganadores.add(candidatos.get(i));
+                } else {
+                    int cmp = CompararManos.compararManos2(
+                            combinaciones.get(i), nombresJugada.get(i),
+                            combinaciones.get(idxGanador), nombresJugada.get(idxGanador)
+                    );
+                    if (cmp > 0) {
+                        ganadores.clear();
+                        ganadores.add(candidatos.get(i));
+                        idxGanador = i;
+                    } else if (cmp == 0) {
+                        ganadores.add(candidatos.get(i));
+                    }
+                }
+            }
+
+            int premioPorJugador = pot.cantidad / ganadores.size();
+            for (Jugador g : ganadores) {
+                g.ganar(premioPorJugador);
+                ganancias.put(g, ganancias.getOrDefault(g, 0) + premioPorJugador);
+            }
         }
+
+        // Mostrar el total de ganancias acumuladas por jugador en esta mano
+        for (var entry : ganancias.entrySet()) {
+            Jugador j = entry.getKey();
+            int totalGanado = entry.getValue();
+            Interfaz.mostrarMensaje(j.getNombre() + " gana un total de " + totalGanado + " fichas en esta mano.");
+        }
+
         Apuesta.aumentarCiegas();
     }
 }

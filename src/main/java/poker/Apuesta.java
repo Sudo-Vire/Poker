@@ -1,16 +1,41 @@
 package poker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Apuesta {
     private static int smallBlind; // Valor ciega pequeña
-    private static int bigBlind; // Valor ciega grande
+    private static int bigBlind;   // Valor ciega grande
     private static int contadorManos; // Manos para aumentar las ciegas
     // Índices para calcular la posición del dealer y las ciegas
     private int dealerIndex;
     private int smallBlindIndex;
     private int bigBlindIndex;
+
+    // --- NUEVO: Estructura de Side Pots (Main pot + side pots sucesivos) ---
+    public static class SidePot {
+        int cantidad;                    // Fichas acumuladas en el pot
+        List<Jugador> participantes;     // Jugadores que pueden optar a este pot
+
+        public SidePot(int cantidad, List<Jugador> jugadores) {
+            this.cantidad = cantidad;
+            this.participantes = new ArrayList<>(jugadores);
+        }
+    }
+
+    // --- Lista de todos los pots de la mano (al menos 1 = Main pot) ---
+    private final List<SidePot> pots = new ArrayList<>();
+
+    public List<SidePot> getPots() {
+        return pots;
+    }
+
+    // Reinicia todos los pots (para comenzar una nueva mano)
+    public void resetPots(List<Jugador> jugadores) {
+        pots.clear();
+        pots.add(new SidePot(0, jugadores));  // Main pot inicial
+    }
 
     public Apuesta(int smallBlind, int bigBlind, int manosParaAumentarCiegas) {
         if (smallBlind <= 0 || bigBlind <= 0 || manosParaAumentarCiegas <= 0) {
@@ -24,13 +49,8 @@ public class Apuesta {
         bigBlindIndex = -1;
     }
 
-    public int getSmallBlindIndex() {
-        return smallBlindIndex;
-    }
-
-    public int getBigBlindIndex() {
-        return bigBlindIndex;
-    }
+    public int getSmallBlindIndex() { return smallBlindIndex; }
+    public int getBigBlindIndex() { return bigBlindIndex; }
 
     // Asigna las posiciones iniciales del dealer y de las ciegas
     public void asignarPosicionesIniciales(List<Jugador> jugadores) {
@@ -40,8 +60,6 @@ public class Apuesta {
         dealerIndex = 0;
         smallBlindIndex = (dealerIndex + 1) % jugadores.size();
         bigBlindIndex = (dealerIndex + 2) % jugadores.size();
-        Interfaz.mostrarMensaje(jugadores.get(smallBlindIndex).getNombre() + " es la Ciega Pequeña.");
-        Interfaz.mostrarMensaje(jugadores.get(bigBlindIndex).getNombre() + " es la Ciega Grande.");
     }
 
     // Rota las posiciones iniciales del dealer y de las ciegas
@@ -54,29 +72,49 @@ public class Apuesta {
         bigBlindIndex = (dealerIndex + 2) % jugadores.size();
     }
 
-    // Descuenta las ciegas a los jugadores correspondientes y suma al pozo.
-    public void ponerCiegas(List<Jugador> jugadores, int[] pozo, int[] apuestas) {
-        // Ciega pequeña
-        if (smallBlindIndex >= 0 && smallBlindIndex < jugadores.size()) {
-            Jugador sb = jugadores.get(smallBlindIndex);
-            if (sb.isEnJuego() && sb.getSaldo() > 0) {
-                int sbMonto = Math.min(sb.getSaldo(), smallBlind);
-                sb.setSaldo(sb.getSaldo() - sbMonto);
-                pozo[0] += sbMonto;
-                apuestas[smallBlindIndex] = sbMonto;
-                Interfaz.mostrarMensaje(sb.getNombre() + " pone la ciega pequeña de " + sbMonto);
+    // --- Método PRIVADO para añadir contribuciones al último pot ---
+    private void agregarAlPot(Jugador jugador, int cantidad, List<Jugador> jugadores) {
+        if (cantidad <= 0) return;
+
+        // Añadir al último pot activo
+        SidePot ultimo = pots.get(pots.size() - 1);
+        ultimo.cantidad += cantidad;
+
+        // Si este jugador se quedó en All-In → se crea un nuevo SidePot para separar apuestas extra posteriores
+        if (jugador.isVaAllIn()) {
+            List<Jugador> nuevos = new ArrayList<>();
+            for (Jugador j : jugadores) {
+                if (j.isEnJuego()) nuevos.add(j);
             }
+            pots.add(new SidePot(0, nuevos));
         }
+    }
+
+    // --- Método PUBLICO para que Interfaz pueda registrar aportes ---
+    public void registrarAporte(Jugador jugador, int cantidad, List<Jugador> jugadores) {
+        agregarAlPot(jugador, cantidad, jugadores);
+    }
+
+    // Descuenta las ciegas a los jugadores correspondientes y suma al pot (ya usando side pots)
+    public void ponerCiegas(List<Jugador> jugadores, int[] apuestas) {
+        resetPots(jugadores);
+
+        // Ciega pequeña
+        Jugador sb = jugadores.get(smallBlindIndex);
+        if (sb.isEnJuego() && sb.getSaldo() > 0) {
+            int sbMonto = Math.min(sb.getSaldo(), smallBlind);
+            sb.setSaldo(sb.getSaldo() - sbMonto);
+            apuestas[smallBlindIndex] = sbMonto;
+            registrarAporte(sb, sbMonto, jugadores);
+        }
+
         // Ciega grande
-        if (bigBlindIndex >= 0 && bigBlindIndex < jugadores.size()) {
-            Jugador bb = jugadores.get(bigBlindIndex);
-            if (bb.isEnJuego() && bb.getSaldo() > 0) {
-                int bbMonto = Math.min(bb.getSaldo(), bigBlind);
-                bb.setSaldo(bb.getSaldo() - bbMonto);
-                pozo[0] += bbMonto;
-                apuestas[bigBlindIndex] = bbMonto;
-                Interfaz.mostrarMensaje(bb.getNombre() + " pone la ciega grande de " + bbMonto);
-            }
+        Jugador bb = jugadores.get(bigBlindIndex);
+        if (bb.isEnJuego() && bb.getSaldo() > 0) {
+            int bbMonto = Math.min(bb.getSaldo(), bigBlind);
+            bb.setSaldo(bb.getSaldo() - bbMonto);
+            apuestas[bigBlindIndex] = bbMonto;
+            registrarAporte(bb, bbMonto, jugadores);
         }
     }
 
@@ -97,14 +135,13 @@ public class Apuesta {
     }
 
     // Controla la ronda de apuestas de acuerdo a la fase actual del juego.
-    public void realizarRondaApuestas(List<Jugador> jugadores, int[] pozo, List<Baraja.Carta> comunitarias, String fase, int primerJugador, int[] apuestas) {
+    // --- MODIFICADO: ahora cada apuesta mueve fichas a side pots mediante registrarAporte ---
+    public void realizarRondaApuestas(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, String fase, int primerJugador, int[] apuestas) {
         int n = jugadores.size();
         int[] apuestaActual = new int[1];
         apuestaActual[0] = (fase.equals("Pre-Flop")) ? bigBlind : 0;
 
         boolean[] yaActuo = new boolean[n];
-        int jugadoresActivos;
-
         boolean todosIgualaron;
 
         do {
@@ -127,13 +164,13 @@ public class Apuesta {
                 int cantidadPorIgualar = apuestaActual[0] - apuestas[i];
                 boolean accionValida = false;
 
-                // Espera a que el jugador haga una acción válida (apostar, igualar, subir, retirarse, all-in)
+                // Espera a que el jugador haga una acción válida
                 while (!accionValida) {
                     int apuestaPrev = apuestaActual[0];
-                    accionValida = Interfaz.aspr(jugador, cantidadPorIgualar, pozo, apuestas, i, apuestaActual, jugadores, fase, bigBlind);
-                    if (apuestaActual[0] == -999) {
-                        return; // La ronda termina si todos, menos uno, se retiran
-                    }
+                    accionValida = Interfaz.aspr(jugador, cantidadPorIgualar, apuestas, i, apuestaActual, jugadores, fase, bigBlind, this);
+
+                    if (apuestaActual[0] == -999) return; // mano terminada
+
                     if (apuestaActual[0] > apuestaPrev) {
                         Arrays.fill(yaActuo, false);
                         yaActuo[i] = true;
@@ -141,41 +178,11 @@ public class Apuesta {
                     }
                 }
                 yaActuo[i] = true;
-
-                if (jugador.isEnJuego() && apuestas[i] < apuestaActual[0] && jugador.getSaldo() > 0 && !jugador.isVaAllIn()) {
-                    todosIgualaron = false;
-                }
             }
 
-            // Cuenta el número de jugadores activos para la ronda
-            jugadoresActivos = 0;
-            for (int i = 0; i < n; i++) {
-                if (jugadores.get(i).isEnJuego() && (jugadores.get(i).getSaldo() > 0 || jugadores.get(i).isVaAllIn())) {
-                    jugadoresActivos++;
-                }
-            }
-
-            if (todosIgualaron) {
-                boolean todosActuaron = true;
-                for (int i = 0; i < n; i++) {
-                    Jugador j = jugadores.get(i);
-                    if (j.isEnJuego() && j.getSaldo() > 0 && !j.isVaAllIn()) {
-                        if (apuestas[i] < apuestaActual[0]) {
-                            todosIgualaron = false;
-                            break;
-                        }
-                        if (!yaActuo[i]) {
-                            todosActuaron = false;
-                        }
-                    }
-                }
-                if (todosIgualaron && todosActuaron) break;
-            }
-
-        } while (jugadoresActivos > 1 && !todosIgualaron);
+        } while (!todosIgualaron);
     }
 
-    // Muestra por consola las cartas comunitarias y en qué fase están.
     private void mostrarCartasComunitarias(List<Baraja.Carta> comunitarias, String fase) {
         StringBuilder mensaje = new StringBuilder(fase + ": ");
         for (Baraja.Carta carta : comunitarias) {

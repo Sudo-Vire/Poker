@@ -58,7 +58,7 @@ public class Jugador {
         if (saldo < 0) throw new IllegalArgumentException("El saldo no puede ser negativo");
         this.saldo = saldo;
         if (saldo == 0 && enJuego) {
-            vaAllIn = true;
+            vaAllIn = true;   // --- Si el saldo llega a 0 estando en juego, el jugador entra en estado ALL-IN ---
         }
     }
     public String getNombre() { return nombre; }
@@ -66,6 +66,6 @@ public class Jugador {
     public List<Baraja.Carta> getMano() { return new ArrayList<>(mano); }
     public boolean isHaApostado() { return haApostado; }
     public void setHaApostado(boolean haApostado) { this.haApostado = haApostado; }
-    public boolean isVaAllIn() { return vaAllIn; }  // GETTER PARA ALL-IN
-    public void setVaAllIn(boolean vaAllIn) { this.vaAllIn = vaAllIn; }  // SETTER PARA ALL-IN
+    public boolean isVaAllIn() { return vaAllIn; }
+    public void setVaAllIn(boolean vaAllIn) { this.vaAllIn = vaAllIn; }
 }

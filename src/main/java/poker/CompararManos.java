@@ -6,7 +6,7 @@ import java.util.List;
 public class CompararManos {
 
     /* Versión simplificada para comparar manos: comparación por valor de carta
-    * Ahora no extrae
+    * Ahora no extrae las cartas y va comparando, sino que directamente las compara y saca la diferencia para comprobar que valor es más alto
     * */
 
     public static int compararManos2(
