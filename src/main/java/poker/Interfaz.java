@@ -40,7 +40,7 @@ public class Interfaz {
         scanner.close();
     }
 
-    // --- MODIFICADO: ahora usa Apuesta (registrarAporte) en vez de pozo[] ---
+    // Interfaz para apostar subir pasar o retirarse
     public static boolean aspr(Jugador jugador, int cantidadPorIgualar, int[] apuestas, int indiceJugador,
                                int[] apuestaActual, List<Jugador> jugadores, String fase, int bigBlindAmount, Apuesta apuesta) {
         boolean accionValida = false;

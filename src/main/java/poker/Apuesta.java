@@ -13,7 +13,6 @@ public class Apuesta {
     private int smallBlindIndex;
     private int bigBlindIndex;
 
-    // --- NUEVO: Estructura de Side Pots (Main pot + side pots sucesivos) ---
     public static class SidePot {
         int cantidad;                    // Fichas acumuladas en el pot
         List<Jugador> participantes;     // Jugadores que pueden optar a este pot
@@ -24,7 +23,7 @@ public class Apuesta {
         }
     }
 
-    // --- Lista de todos los pots de la mano (al menos 1 = Main pot) ---
+    // Lista de todos los pots de la mano
     private final List<SidePot> pots = new ArrayList<>();
 
     public List<SidePot> getPots() {
@@ -72,7 +71,7 @@ public class Apuesta {
         bigBlindIndex = (dealerIndex + 2) % jugadores.size();
     }
 
-    // --- Método PRIVADO para añadir contribuciones al último pot ---
+    // Método PRIVADO para añadir contribuciones al último pot
     private void agregarAlPot(Jugador jugador, int cantidad, List<Jugador> jugadores) {
         if (cantidad <= 0) return;
 
@@ -90,7 +89,7 @@ public class Apuesta {
         }
     }
 
-    // --- Método PUBLICO para que Interfaz pueda registrar aportes ---
+    // Método PUBLICO para que Interfaz pueda registrar aportes
     public void registrarAporte(Jugador jugador, int cantidad, List<Jugador> jugadores) {
         agregarAlPot(jugador, cantidad, jugadores);
     }
@@ -135,7 +134,6 @@ public class Apuesta {
     }
 
     // Controla la ronda de apuestas de acuerdo a la fase actual del juego.
-    // --- MODIFICADO: ahora cada apuesta mueve fichas a side pots mediante registrarAporte ---
     public void realizarRondaApuestas(List<Jugador> jugadores, List<Baraja.Carta> comunitarias, String fase, int primerJugador, int[] apuestas) {
         int n = jugadores.size();
         int[] apuestaActual = new int[1];

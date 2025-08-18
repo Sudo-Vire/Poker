@@ -57,12 +57,12 @@ public class Poker {
 
             Interfaz.mostrarMensaje("¿Desean jugar otra mano? (s/n)");
             String respuesta = Interfaz.leerLinea();
-            if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego
-                break;
-            } else if (!respuesta.equalsIgnoreCase("n")) {
-                continue;
-            } else {
-                Interfaz.mostrarMensaje("Introduce una opción válida");
+            while (!respuesta.equalsIgnoreCase("s") && !respuesta.equalsIgnoreCase("n")) {
+                if (!respuesta.equalsIgnoreCase("s")) {             // Si la respuesta es "n", termina el juego
+                    break;
+                } else {
+                    Interfaz.mostrarMensaje("Introduce una opción válida");
+                }
             }
             manoActual++;
         }
