@@ -168,7 +168,6 @@ public class Poker {
 
     // Muestra el jugador con más fichas tras la mano y los saldos actuales
     private static void mostrarResumenManoFinal(List<Jugador> jugadores) {
-        // --- MODIFICADO: usar streams para evitar warnings sobre maxJugador ---
         jugadores.stream()
                 .max(Comparator.comparingInt(Jugador::getSaldo))
                 .ifPresent(maxJugador ->
@@ -246,7 +245,6 @@ public class Poker {
             int totalGanado = entry.getValue();
             Interfaz.mostrarMensaje(j.getNombre() + " gana un total de " + totalGanado + " fichas en esta mano.");
         }
-
         Apuesta.aumentarCiegas();
     }
 }

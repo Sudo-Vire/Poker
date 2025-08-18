@@ -111,7 +111,7 @@ public class Interfaz {
                     posibleGanador.ganar(pot.cantidad);
                     pot.cantidad = 0;
                 }
-                apuestaActual[0] = -999; // <-- Solo aquí se marca el fin
+                apuestaActual[0] = -999;
             }
         } else {
             Interfaz.mostrarMensaje("Opción no válida.");
