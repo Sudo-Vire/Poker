@@ -1,17 +1,17 @@
 package poker;
 
 import org.junit.jupiter.api.Test;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
-class TodosAllInOSoloUnoActivoTest {
+class JugadoresActivosTest {
 
     // ------------------------------------
-    // Caso 1: Dos jugadores con saldo > 0 y en juego
-    // Esperado: FALSE (nadie all-in y más de uno activo)
+    // Caso 1: Dos jugadores activos
+    // Esperado: TRUE (Todos activos)
     // ------------------------------------
     @Test
-    void testTodosConSaldoActivos() {
+    void testTodosConSaldoActivos_True() {
         Jugador j1 = new Jugador("Ana", 1000);
         Jugador j2 = new Jugador("Luis", 1000);
 
@@ -23,11 +23,27 @@ class TodosAllInOSoloUnoActivoTest {
     }
 
     // ------------------------------------
+    // Caso 1: Dos jugadores activos
+    // Esperado: True (1 activo)
+    // ------------------------------------
+    @Test
+    void testTodosConSaldoActivos_False() {
+        Jugador j1 = new Jugador("Ana", 1000);
+        Jugador j2 = new Jugador("Luis", 1000);
+
+        j1.enJuego=true;
+        j2.enJuego=false;
+
+        boolean resultado = invokeTodosAllInOSoloUnoActivo(List.of(j1, j2));
+        assertTrue(resultado);
+    }
+
+    // ------------------------------------
     // Caso 2: Solo un jugador activo
     // Esperado: TRUE (la mano termina porque solo queda uno)
     // ------------------------------------
     @Test
-    void testSoloUnJugadorActivo() {
+    void testSoloUnJugadorActivo_True() {
         Jugador j3 = new Jugador("Ana", 1000);
         Jugador j4 = new Jugador("Luis", 1000);
 
@@ -43,7 +59,7 @@ class TodosAllInOSoloUnoActivoTest {
     // Esperado: TRUE (nadie puede apostar más)
     // ------------------------------------
     @Test
-    void testTodosAllIn() {
+    void testTodosAllIn_True() {
         Jugador j5 = new Jugador("Ana", 0);
         Jugador j6 = new Jugador("Luis", 0);
 

@@ -91,7 +91,6 @@ public class Poker {
             Interfaz.limpiarPantalla();
         }
 
-        // --- MODIFICADO: ahora las ciegas van al sistema de Side Pots ---
         apuesta.ponerCiegas(jugadores, apuestas);
 
         boolean finalizarPorAllIn;
