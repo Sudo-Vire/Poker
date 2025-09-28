@@ -1,0 +1,257 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "poker.Poker",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_106847225 { 
+   	label=poker
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   Apuesta106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Apuesta</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   bigBlindIndex: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   dealerIndex: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   pots: List&lt;SidePot&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   smallBlindIndex: int [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- agregarAlPot(jugador: Jugador, cantidad: int, jugadores: List&lt;Jugador&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ asignarPosicionesIniciales(jugadores: List&lt;Jugador&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ aumentarCiegas()</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarCartasComunitarias(comunitarias: List&lt;Carta&gt;, fase: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ mostrarCiegasActuales()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ ponerCiegas(jugadores: List&lt;Jugador&gt;, apuestas: int[])</TD></TR>
+<TR><TD ALIGN="LEFT" >+ realizarRondaApuestas(jugadores: List&lt;Jugador&gt;, comunitarias: List&lt;Carta&gt;, fase: String, primerJugador: int, apuestas: int[])</TD></TR>
+<TR><TD ALIGN="LEFT" >+ registrarAporte(jugador: Jugador, cantidad: int, jugadores: List&lt;Jugador&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ resetPots(jugadores: List&lt;Jugador&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ rotarPosiciones(jugadores: List&lt;Jugador&gt;)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Baraja106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Baraja</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cartas: List&lt;Carta&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   indice: int [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- barajar()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ repartirCarta(): Carta</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+CompararManos106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)CompararManos</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ compararManos2(cartasPrincipales1: List&lt;Carta&gt;, nombreJugada1: String, cartasPrincipales2: List&lt;Carta&gt;, nombreJugada2: String): int</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+EvaluarManos106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)EvaluarManos</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- agruparPorValor(mano: List&lt;Carta&gt;): Map&lt;Integer, List&lt;Carta&gt;&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- compararDesempate(mano1: List&lt;Carta&gt;, mano2: List&lt;Carta&gt;): int</TD></TR>
+<TR><TD ALIGN="LEFT" >- esColor(mano: List&lt;Carta&gt;): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- esEscalera(mano: List&lt;Carta&gt;): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ evaluarCombinacion(mano: List&lt;Carta&gt;): ResultadoEvaluacion</TD></TR>
+<TR><TD ALIGN="LEFT" >+ evaluarManoCompleta(manoJugador: List&lt;Carta&gt;, cartasComunitarias: List&lt;Carta&gt;): ResultadoEvaluacion</TD></TR>
+<TR><TD ALIGN="LEFT" >+ generarCombinaciones(cartas: List&lt;Carta&gt;): List&lt;List&lt;Carta&gt;&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- generarCombinacionesRecursivo(cartas: List&lt;Carta&gt;, actual: List&lt;Carta&gt;, combinaciones: List&lt;List&lt;Carta&gt;&gt;, inicio: int, longitud: int)</TD></TR>
+<TR><TD ALIGN="LEFT" ># obtenerValorMano(nombre: String): int</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Interfaz106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Interfaz</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ aspr(jugador: Jugador, cantidadPorIgualar: int, apuestas: int[], indiceJugador: int, apuestaActual: int[], jugadores: List&lt;Jugador&gt;, fase: String, bigBlindAmount: int, apuesta: Apuesta): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ cerrarScanner()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ leerLinea(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ leerNumero(mensaje: String, min: int, max: int): int</TD></TR>
+<TR><TD ALIGN="LEFT" >+ limpiarPantalla()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ mostrarMensaje(mensaje: String)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Jugador106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Jugador</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   enJuego: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   haApostado: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mano: List&lt;Carta&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   nombre: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   saldo: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   vaAllIn: boolean [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ ganar(cantidad: int)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ mostrarMano()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ nuevaMano()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ recibirCarta(carta: Carta)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Poker106847225[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Poker</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- jugarMano(jugadores: List&lt;Jugador&gt;, baraja: Baraja, apuesta: Apuesta)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ main(args: String[])</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarCartasComunitarias(comunitarias: List&lt;Carta&gt;, fase: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarResumenManoFinal(jugadores: List&lt;Jugador&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >- showdown(comunitarias: List&lt;Carta&gt;, pots: List&lt;SidePot&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >- todosAllInOSoloUnoActivo(jugadores: List&lt;Jugador&gt;): boolean</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+subgraph cluster_1982598277 { 
+   	label=Baraja
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   Carta1067148262[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Carta</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >#   palo: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   valor: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >#   valorNumerico: int [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ compareTo(o: Carta): int</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+'edges    
+Baraja106847225 -> Carta1067148262[label="cartas
+[0..*]"];
+Interfaz106847225 -> Jugador106847225[label="aspr() -> ganar()"];
+Jugador106847225 -> Carta1067148262[label="mano
+[0..*]"];
+Jugador106847225 -> Interfaz106847225[label="mostrarMano() -> mostrarMensaje()"];
+Poker106847225 -> CompararManos106847225[label="showdown() -> compararManos2()"];
+Poker106847225 -> EvaluarManos106847225[label="showdown() -> evaluarManoCompleta()"];
+    
+}
+@enduml
