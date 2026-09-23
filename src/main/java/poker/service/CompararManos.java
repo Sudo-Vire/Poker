@@ -1,4 +1,6 @@
-package poker;
+package poker.service;
+
+import poker.model.Carta;
 
 import java.util.List;
 
@@ -10,9 +12,9 @@ public class CompararManos {
     * */
 
     public static int compararManos2(
-            List<Baraja.Carta> cartasPrincipales1,
+            List<Carta> cartasPrincipales1,
             String nombreJugada1,
-            List<Baraja.Carta> cartasPrincipales2,
+            List<Carta> cartasPrincipales2,
             String nombreJugada2
     ) {
         int valorMano1 = EvaluarManos.obtenerValorMano(nombreJugada1);
@@ -21,7 +23,7 @@ public class CompararManos {
 
         // Compara de mayor a menor cada carta usada en la jugada principal
         for (int i = 0; i < Math.min(cartasPrincipales1.size(), cartasPrincipales2.size()); i++) {
-            int diff = cartasPrincipales1.get(i).valorNumerico - cartasPrincipales2.get(i).valorNumerico;
+            int diff = cartasPrincipales1.get(i).getValorNumerico() - cartasPrincipales2.get(i).getValorNumerico();
             if (diff != 0) return diff;
         }
         return 0; // Empate total
