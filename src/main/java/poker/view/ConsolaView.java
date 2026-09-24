@@ -13,6 +13,8 @@ public class ConsolaView implements AutoCloseable {
     private final Scanner scanner;
     private final PrintStream output;
 
+    private String lineaPendiente;
+
     public ConsolaView() {
         this(System.in, System.out);
     }
@@ -45,7 +47,32 @@ public class ConsolaView implements AutoCloseable {
     }
 
     public String leerLinea() {
+        if (lineaPendiente != null) {
+            String linea = lineaPendiente;
+            lineaPendiente = null;
+            return linea;
+        }
         return scanner.hasNextLine() ? scanner.nextLine().trim() : "";
+    }
+
+    public Integer leerNumeroOpcional(String mensaje, int minimo, int maximo) {
+        while (true) {
+            output.print(mensaje);
+            if (!scanner.hasNextLine()) {
+                return minimo;
+            }
+            String linea = scanner.nextLine().trim();
+            try {
+                int numero = Integer.parseInt(linea);
+                if (numero >= minimo && numero <= maximo) {
+                    return numero;
+                }
+                output.println("Introduce un número entre " + minimo + " y " + maximo + ".");
+            } catch (NumberFormatException excepcion) {
+                lineaPendiente = linea;
+                return null;
+            }
+        }
     }
 
     public void mostrarMensaje(String mensaje) {

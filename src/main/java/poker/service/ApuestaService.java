@@ -2,6 +2,7 @@ package poker.service;
 
 import poker.model.Carta;
 import poker.model.Jugador;
+import poker.PokerBot;
 import poker.view.ConsolaView;
 
 import java.util.ArrayList;
@@ -204,26 +205,91 @@ public class ApuestaService {
                     continue;
                 }
 
-                mostrarEstadoDeRonda(jugador, comunitarias, fase, apuestas[indice], apuestaActual[0]);
                 boolean accionValida = false;
                 while (!accionValida) {
                     int apuestaAnterior = apuestaActual[0];
-                    accionValida = ejecutarAccion(jugador, jugadores, apuestas, indice,
-                            apuestaActual, fase);
+                    if (jugador.esMaquina()) {
+                        accionValida = ejecutarAccionBot(jugador, jugadores, comunitarias,
+                                apuestas, indice, apuestaActual);
+                    } else {
+                        mostrarEstadoDeRonda(jugador, comunitarias, fase, apuestas[indice], apuestaActual[0]);
+                        accionValida = ejecutarAccion(jugador, jugadores, apuestas, indice,
+                                apuestaActual, fase);
+                    }
                     if (apuestaActual[0] == -999) {
                         return true;
                     }
+
                     if (apuestaActual[0] > apuestaAnterior) {
                         Arrays.fill(yaActuo, false);
                         todosIgualaron = false;
                     }
                 }
+
                 yaActuo[indice] = true;
             }
             if (todosIgualaron) {
                 return false;
             }
         }
+    }
+
+    private boolean ejecutarAccionBot(Jugador jugador, List<Jugador> jugadores,
+                                      List<Carta> comunitarias, int[] apuestas, int indice,
+                                      int[] apuestaActual) {
+        PokerBot bot = jugador.getBot();
+        bot.reiniciarMano();
+        bot.recibirCartasOcultas(jugador.getMano().get(0), jugador.getMano().get(1));
+        comunitarias.forEach(bot::agregarCartaComunitaria);
+        PokerBot.Posicion posicion = indice == smallBlindIndex
+                ? PokerBot.Posicion.CIEGA_PEQUENA
+                : indice == bigBlindIndex ? PokerBot.Posicion.CIEGA_GRANDE : PokerBot.Posicion.MEDIA;
+        String decision = bot.tomarDecision(apuestaActual[0], obtenerTamanoPote(),
+                posicion, jugadores.size());
+        int porIgualar = Math.max(0, apuestaActual[0] - apuestas[indice]);
+
+        if ("FOLD".equals(decision)) {
+            mostrarAccionBot(jugador.getNombre() + " se retira.");
+            jugador.setEnJuego(false);
+            Jugador ultimo = unicoJugadorActivo(jugadores);
+            if (ultimo != null) {
+                for (SidePot pot : pots) {
+                    ultimo.ganar(pot.cantidad);
+                    pot.cantidad = 0;
+                }
+                apuestaActual[0] = -999;
+            }
+            return true;
+        }
+        if ("IGUALDAD".equals(decision) || "PASAR".equals(decision)) {
+            mostrarAccionBot(jugador.getNombre() + ("IGUALDAD".equals(decision)
+                    ? " iguala la apuesta."
+                    : " pasa."));
+            aportar(jugador, Math.min(jugador.getSaldo(), porIgualar), jugadores, apuestas, indice);
+            return true;
+        }
+        if (decision.startsWith("SUBIDA:")) {
+            int subida = (int) Double.parseDouble(decision.substring("SUBIDA:".length()));
+            int cantidad = Math.min(jugador.getSaldo(), porIgualar + Math.max(1, subida));
+            if (cantidad > porIgualar) {
+                mostrarAccionBot(jugador.getNombre() + " sube " + (cantidad - porIgualar)
+                        + " fichas.");
+                aportar(jugador, cantidad, jugadores, apuestas, indice);
+                apuestaActual[0] = apuestas[indice];
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void mostrarAccionBot(String mensaje) {
+        view.mostrarMensaje("");
+        view.mostrarMensaje(mensaje);
+        view.mostrarMensaje("");
+    }
+
+    private int obtenerTamanoPote() {
+        return pots.stream().mapToInt(SidePot::getCantidad).sum();
     }
 
     private void mostrarEstadoDeRonda(Jugador jugador, List<Carta> comunitarias,

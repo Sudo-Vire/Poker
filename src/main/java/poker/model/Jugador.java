@@ -1,5 +1,7 @@
 package poker.model;
 
+import poker.PokerBot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +11,19 @@ public class Jugador {
     private int saldo;
     public boolean enJuego;
     private boolean vaAllIn;
+    private final PokerBot bot;
 
     public Jugador(String nombre, int saldoInicial) {
+        this(nombre, saldoInicial, false);
+    }
+
+    public Jugador(String nombre, int saldoInicial, boolean maquina) {
         this.nombre = nombre;
         this.mano = new ArrayList<>();
         this.saldo = saldoInicial;
         this.enJuego = true;
         this.vaAllIn = false;
+        this.bot = maquina ? new PokerBot(nombre, saldoInicial) : null;
     }
 
     // Agrega una carta a la mano del jugador
@@ -74,5 +82,13 @@ public class Jugador {
 
     public void setVaAllIn(boolean vaAllIn) {
         this.vaAllIn = vaAllIn;
+    }
+
+    public boolean esMaquina() {
+        return bot != null;
+    }
+
+    public PokerBot getBot() {
+        return bot;
     }
 }
