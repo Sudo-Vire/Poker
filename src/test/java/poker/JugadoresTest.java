@@ -1,85 +1,78 @@
 package poker;
 
 import org.junit.jupiter.api.Test;
+import poker.model.Carta;
+import poker.model.Jugador;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
 
-class JugadoresActivosTest {
+class JugadoresTest {
 
-    // ------------------------------------
-    // Caso 1: Dos jugadores activos
-    // Esperado: TRUE (Todos activos)
-    // ------------------------------------
     @Test
-    void testTodosConSaldoActivos_True() {
-        Jugador j1 = new Jugador("Ana", 1000);
-        Jugador j2 = new Jugador("Luis", 1000);
+    void crearUnJugador_shouldBeTrue() {
+        Jugador jugador = new Jugador("Ana", 1000);
 
-        j1.enJuego=true;
-        j2.enJuego=true;
-
-        boolean resultado = invokeTodosAllInOSoloUnoActivo(List.of(j1, j2));
-        assertFalse(resultado);
+        assertEquals("Ana", jugador.getNombre());
+        assertEquals(1000, jugador.getSaldo());
+        assertTrue(jugador.isEnJuego());
+        assertFalse(jugador.isVaAllIn());
+        assertTrue(jugador.getMano().isEmpty());
     }
 
-    // ------------------------------------
-    // Caso 1: Dos jugadores activos
-    // Esperado: True (1 activo)
-    // ------------------------------------
     @Test
-    void testTodosConSaldoActivos_False() {
-        Jugador j1 = new Jugador("Ana", 1000);
-        Jugador j2 = new Jugador("Luis", 1000);
+    void crearUnJugador_shouldBeFalse() {
+        Jugador jugador = new Jugador("Ana", 1000);
 
-        j1.enJuego=true;
-        j2.enJuego=false;
-
-        boolean resultado = invokeTodosAllInOSoloUnoActivo(List.of(j1, j2));
-        assertTrue(resultado);
+        assertFalse(jugador.isVaAllIn());
+        assertFalse(!jugador.isEnJuego());
     }
 
-    // ------------------------------------
-    // Caso 2: Solo un jugador activo
-    // Esperado: TRUE (la mano termina porque solo queda uno)
-    // ------------------------------------
     @Test
-    void testSoloUnJugadorActivo_True() {
-        Jugador j3 = new Jugador("Ana", 1000);
-        Jugador j4 = new Jugador("Luis", 1000);
+    void recibirCartaYReiniciarLaMano_shouldBeTrue() {
+        Jugador jugador = new Jugador("Ana", 1000);
+        jugador.recibirCarta(new Carta("Picas", "A"));
+        jugador.setVaAllIn(true);
+        jugador.setEnJuego(false);
 
-        j3.enJuego=true;
-        j4.enJuego=false;
+        jugador.nuevaMano();
 
-        boolean resultado = invokeTodosAllInOSoloUnoActivo(List.of(j3, j4));
-        assertTrue(resultado);
+        assertTrue(jugador.isEnJuego());
+        assertFalse(jugador.isVaAllIn());
+        assertTrue(jugador.getMano().isEmpty());
     }
 
-    // ------------------------------------
-    // Caso 3: Todos están all-in
-    // Esperado: TRUE (nadie puede apostar más)
-    // ------------------------------------
     @Test
-    void testTodosAllIn_True() {
-        Jugador j5 = new Jugador("Ana", 0);
-        Jugador j6 = new Jugador("Luis", 0);
+    void establecerSaldoCero_shouldBeTrue() {
+        Jugador jugador = new Jugador("Ana", 1000);
 
-        j5.enJuego=true;
-        j5.setVaAllIn(true);
+        jugador.setSaldo(0);
 
-        j6.enJuego=true;
-        j6.setVaAllIn(true);
-
-        boolean resultado = invokeTodosAllInOSoloUnoActivo(List.of(j5, j6));
-        assertTrue(resultado);
+        assertEquals(0, jugador.getSaldo());
+        assertTrue(jugador.isVaAllIn());
     }
 
-    private boolean invokeTodosAllInOSoloUnoActivo(List<Jugador> jugadores) {
-        try {
-            var metodo = Poker.class.getDeclaredMethod("todosAllInOSoloUnoActivo", List.class);
-            metodo.setAccessible(true);
-            return (boolean) metodo.invoke(null, jugadores);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void establecerSaldoPositivo_shouldBeFalse() {
+        Jugador jugador = new Jugador("Ana", 1000);
+
+        jugador.setSaldo(500);
+
+        assertFalse(jugador.isVaAllIn());
+    }
+
+    @Test
+    void ganarFichas_shouldBeTrue() {
+        Jugador jugador = new Jugador("Ana", 1000);
+
+        jugador.ganar(250);
+
+        assertEquals(1250, jugador.getSaldo());
+    }
+
+    @Test
+    void establecerSaldoNegativo_shouldThrowException() {
+        Jugador jugador = new Jugador("Ana", 1000);
+
+        assertThrows(IllegalArgumentException.class, () -> jugador.setSaldo(-1));
     }
 }

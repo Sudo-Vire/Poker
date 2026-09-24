@@ -1,4 +1,6 @@
-package poker;
+package poker.service;
+
+import poker.model.Carta;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9,28 +11,28 @@ public class EvaluarManos {
     // Clase simple para devolver el nombre de la jugada y las cartas principales utilizadas en la evaluación
     public static class ResultadoEvaluacion {
         public String nombreJugada;                     // Ej: "Full", "Escalera", etc.
-        public List<Baraja.Carta> cartasPrincipales;    // Las cinco cartas más importantes usadas para esa jugada
+        public List<Carta> cartasPrincipales;    // Las cinco cartas más importantes usadas para esa jugada
 
-        public ResultadoEvaluacion(String nombreJugada, List<Baraja.Carta> cartasPrincipales) {
+        public ResultadoEvaluacion(String nombreJugada, List<Carta> cartasPrincipales) {
             this.nombreJugada = nombreJugada;
             this.cartasPrincipales = cartasPrincipales;
         }
     }
 
     // Recibe la mano de un jugador y las comunitarias, busca la mejor combinación posible
-    public static ResultadoEvaluacion evaluarManoCompleta(List<Baraja.Carta> manoJugador, List<Baraja.Carta> cartasComunitarias) {
-        List<Baraja.Carta> todasLasCartas = new ArrayList<>(manoJugador);
+    public static ResultadoEvaluacion evaluarManoCompleta(List<Carta> manoJugador, List<Carta> cartasComunitarias) {
+        List<Carta> todasLasCartas = new ArrayList<>(manoJugador);
         todasLasCartas.addAll(cartasComunitarias);
 
         // Obtiene todas las combinaciones posibles de 5 cartas de las 7 cartas disponibles
-        List<List<Baraja.Carta>> combinaciones = generarCombinaciones(todasLasCartas);
+        List<List<Carta>> combinaciones = generarCombinaciones(todasLasCartas);
 
         String mejorMano = "";
         int mejorValor = 0;
-        List<Baraja.Carta> mejoresPrincipales = null;
+        List<Carta> mejoresPrincipales = null;
 
         // Busca entre todas las combinaciones la jugada con mayor valor (jerarquía estándar de póker)
-        for (List<Baraja.Carta> combinacion : combinaciones) {
+        for (List<Carta> combinacion : combinaciones) {
             ResultadoEvaluacion resEval = evaluarCombinacion(combinacion);
             String manoActual = resEval.nombreJugada;
             int valorActual = obtenerValorMano(manoActual);
@@ -49,14 +51,14 @@ public class EvaluarManos {
     }
 
     // Genera todas las combinaciones de 5 cartas a partir de una lista
-    public static List<List<Baraja.Carta>> generarCombinaciones(List<Baraja.Carta> cartas) {
-        List<List<Baraja.Carta>> combinaciones = new ArrayList<>();
+    public static List<List<Carta>> generarCombinaciones(List<Carta> cartas) {
+        List<List<Carta>> combinaciones = new ArrayList<>();
         generarCombinacionesRecursivo(cartas, new ArrayList<>(), combinaciones, 0, 5);
         return combinaciones;
     }
 
     // Método recursivo auxiliar para formar todas las combinaciones de tamaño fijo
-    private static void generarCombinacionesRecursivo(List<Baraja.Carta> cartas, List<Baraja.Carta> actual, List<List<Baraja.Carta>> combinaciones, int inicio, int longitud) {
+    private static void generarCombinacionesRecursivo(List<Carta> cartas, List<Carta> actual, List<List<Carta>> combinaciones, int inicio, int longitud) {
         if (longitud == 0) {
             combinaciones.add(new ArrayList<>(actual));
         } else {
@@ -69,14 +71,15 @@ public class EvaluarManos {
     }
 
     // Evalúa una combinación específica de 5 cartas y devuelve la jugada y las cartas principales
-    public static ResultadoEvaluacion evaluarCombinacion(List<Baraja.Carta> mano) {
+    public static ResultadoEvaluacion evaluarCombinacion(List<Carta> mano) {
+        mano = new ArrayList<>(mano);
         // Ordena de mayor a menor valor las cartas para facilitar análisis
-        mano.sort(Comparator.comparingInt(c -> -c.valorNumerico));
+        mano.sort(Comparator.comparingInt(c -> -c.getValorNumerico()));
         boolean escalera = esEscalera(mano);
         boolean color = esColor(mano);
 
         // 1. Escalera real (A-K-Q-J-10 mismo palo)
-        if (escalera && color && mano.get(0).valorNumerico == 14) {
+        if (escalera && color && mano.get(0).getValorNumerico() == 14) {
             return new ResultadoEvaluacion("Escalera Real", new ArrayList<>(mano));
         }
 
@@ -86,13 +89,13 @@ public class EvaluarManos {
         }
 
         // Agrupa las cartas por su valor
-        Map<Integer, List<Baraja.Carta>> grupos = agruparPorValor(mano);
+        Map<Integer, List<Carta>> grupos = agruparPorValor(mano);
 
         // 3. Poker (cuatro del mismo valor)
         if (grupos.values().stream().anyMatch(l -> l.size() == 4)) {
-            List<Baraja.Carta> cuarteto = grupos.values().stream().filter(l -> l.size() == 4).findFirst().orElse(new ArrayList<>());
-            Baraja.Carta kicker = mano.stream().filter(c -> !cuarteto.contains(c)).findFirst().orElse(null);
-            List<Baraja.Carta> resultado = new ArrayList<>(cuarteto);
+            List<Carta> cuarteto = grupos.values().stream().filter(l -> l.size() == 4).findFirst().orElse(new ArrayList<>());
+            Carta kicker = mano.stream().filter(c -> !cuarteto.contains(c)).findFirst().orElse(null);
+            List<Carta> resultado = new ArrayList<>(cuarteto);
             if (kicker != null) resultado.add(kicker);
             return new ResultadoEvaluacion("Poker", resultado);
         }
@@ -100,9 +103,9 @@ public class EvaluarManos {
         // 4. Full: trío + pareja
         if (grupos.values().stream().anyMatch(l -> l.size() == 3) &&
                 grupos.values().stream().anyMatch(l -> l.size() == 2)) {
-            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
-            List<Baraja.Carta> par = grupos.values().stream().filter(l -> l.size() == 2).findFirst().orElse(new ArrayList<>());
-            List<Baraja.Carta> resultado = new ArrayList<>(trio);
+            List<Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
+            List<Carta> par = grupos.values().stream().filter(l -> l.size() == 2).findFirst().orElse(new ArrayList<>());
+            List<Carta> resultado = new ArrayList<>(trio);
             resultado.addAll(par);
             return new ResultadoEvaluacion("Full", resultado);
         }
@@ -119,21 +122,21 @@ public class EvaluarManos {
 
         // 7. Trío
         if (grupos.values().stream().anyMatch(l -> l.size() == 3)) {
-            List<Baraja.Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
-            List<Baraja.Carta> kicker = mano.stream().filter(c -> !trio.contains(c)).limit(2).toList();
-            List<Baraja.Carta> resultado = new ArrayList<>(trio);
+            List<Carta> trio = grupos.values().stream().filter(l -> l.size() == 3).findFirst().orElse(new ArrayList<>());
+            List<Carta> kicker = mano.stream().filter(c -> !trio.contains(c)).limit(2).toList();
+            List<Carta> resultado = new ArrayList<>(trio);
             resultado.addAll(kicker);
             return new ResultadoEvaluacion("Trío", resultado);
         }
 
         // 8. Doble pareja
-        List<List<Baraja.Carta>> pares = grupos.values().stream()
+        List<List<Carta>> pares = grupos.values().stream()
                 .filter(l -> l.size() == 2)
-                .sorted((a, b) -> b.get(0).valorNumerico - a.get(0).valorNumerico)
+                .sorted((a, b) -> b.get(0).getValorNumerico() - a.get(0).getValorNumerico())
                 .toList();
 
         if (pares.size() >= 2) {
-            List<Baraja.Carta> dosPares = new ArrayList<>();
+            List<Carta> dosPares = new ArrayList<>();
             dosPares.addAll(pares.get(0));
             dosPares.addAll(pares.get(1));
             mano.stream().filter(c -> !dosPares.contains(c)).findFirst().ifPresent(dosPares::add);
@@ -142,9 +145,9 @@ public class EvaluarManos {
 
         // 9. Un par
         if (pares.size() == 1) {
-            List<Baraja.Carta> par = pares.get(0);
-            List<Baraja.Carta> kicker = mano.stream().filter(c -> !par.contains(c)).limit(3).toList();
-            List<Baraja.Carta> resultado = new ArrayList<>(par);
+            List<Carta> par = pares.get(0);
+            List<Carta> kicker = mano.stream().filter(c -> !par.contains(c)).limit(3).toList();
+            List<Carta> resultado = new ArrayList<>(par);
             resultado.addAll(kicker);
             return new ResultadoEvaluacion("Par", resultado);
         }
@@ -154,8 +157,8 @@ public class EvaluarManos {
     }
 
     // Determina si las cartas forman una escalera (5 consecutivas)
-    private static boolean esEscalera(List<Baraja.Carta> mano) {
-        List<Integer> valores = mano.stream().map(c -> c.valorNumerico).distinct().sorted(Comparator.reverseOrder()).toList();
+    private static boolean esEscalera(List<Carta> mano) {
+        List<Integer> valores = mano.stream().map(Carta::getValorNumerico).distinct().sorted(Comparator.reverseOrder()).toList();
         for (int i = 0; i <= valores.size() - 5; i++) {
             boolean consecutivos = true;
             for (int j = 0; j < 4; j++) {
@@ -171,13 +174,13 @@ public class EvaluarManos {
     }
 
     // Determina si todas las cartas son del mismo palo (color)
-    private static boolean esColor(List<Baraja.Carta> mano) {
-        return mano.stream().collect(Collectors.groupingBy(c -> c.palo)).values().stream().anyMatch(l -> l.size() >= 5);
+    private static boolean esColor(List<Carta> mano) {
+        return mano.stream().collect(Collectors.groupingBy(Carta::getPalo)).values().stream().anyMatch(l -> l.size() >= 5);
     }
 
     // Agrupa las cartas por valor numérico
-    private static Map<Integer, List<Baraja.Carta>> agruparPorValor(List<Baraja.Carta> mano) {
-        return mano.stream().collect(Collectors.groupingBy(c -> c.valorNumerico));
+    private static Map<Integer, List<Carta>> agruparPorValor(List<Carta> mano) {
+        return mano.stream().collect(Collectors.groupingBy(Carta::getValorNumerico));
     }
 
     // Asocia un valor numérico a cada tipo de jugada
@@ -198,10 +201,10 @@ public class EvaluarManos {
     }
 
     // Compara dos combinaciones de cartas de desempate para saber cuál es la mejor
-    private static int compararDesempate(List<Baraja.Carta> mano1, List<Baraja.Carta> mano2) {
+    private static int compararDesempate(List<Carta> mano1, List<Carta> mano2) {
         if (mano1 == null || mano2 == null) return 0;
         for (int i = 0; i < Math.min(mano1.size(), mano2.size()); i++) {
-            int diff = mano1.get(i).valorNumerico - mano2.get(i).valorNumerico;
+            int diff = mano1.get(i).getValorNumerico() - mano2.get(i).getValorNumerico();
             if (diff != 0) return diff;
         }
         return 0;

@@ -1,39 +1,82 @@
 package poker;
 
 import org.junit.jupiter.api.Test;
+import poker.model.Baraja;
+import poker.model.Carta;
+import poker.service.BarajaService;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.*;
 
 class CartasTest {
+
+    private final BarajaService barajaService = new BarajaService();
+
     @Test
-    void BarajaTiene52CartasDistintasTest() {
-        Baraja baraja = new Baraja();
-        Set<String> cartasUnicas = new HashSet<>();
-        for (int i = 0; i < 52; i++) {
-            Baraja.Carta carta = baraja.repartirCarta();
-            assertNotNull(carta, "No debería repartir una carta nula");
-            cartasUnicas.add(carta.toString());
+    void crearUnaBarajaCompleta_shouldBeTrue() {
+        Baraja baraja = barajaService.crearBarajaCompleta();
+
+        Set<String> cartas = new HashSet<>();
+        for (int i = 0; i < baraja.getTamanio(); i++) {
+            cartas.add(baraja.obtenerCarta(i).toString());
         }
-        assertEquals(52, cartasUnicas.size(), "La baraja debe tener 52 cartas únicas");
+
+        assertEquals(52, baraja.getTamanio());
+        assertEquals(52, cartas.size());
+        assertEquals(0, baraja.getIndice());
     }
 
     @Test
-    void RepartirMasDe52CartasBarajaTest() {
-        Baraja baraja = new Baraja();
-        for (int i = 0; i < 52; i++) {
-            baraja.repartirCarta(); // gasta toda la baraja
-        }
-        // La siguiente carta debería repartirse sin problemas
-        assertDoesNotThrow(baraja::repartirCarta,
-                "Repartir más de 52 cartas debería barajar y no lanzar excepción");
+    void repartirLaCantidadSolicitada_shouldBeTrue() {
+        Baraja baraja = barajaService.crearBarajaCompleta();
+
+        List<Carta> cartas = barajaService.repartirCartas(baraja, 5);
+
+        assertEquals(5, cartas.size());
+        assertTrue(cartas.stream().allMatch(carta -> carta != null));
+        assertEquals(5, baraja.getIndice());
     }
 
     @Test
-    void ComparacionCartasTest() {
-        Baraja.Carta as = new Baraja.Carta("Picas", "A");
-        Baraja.Carta tres = new Baraja.Carta("Tréboles", "3");
+    void repartirDespuesDeAgotarLaBaraja_shouldBeTrue() {
+        Baraja baraja = barajaService.crearBarajaCompleta();
 
-        assertTrue(as.compareTo(tres) > 0, "El As debería ser mayor que el Rey");
-        assertTrue(tres.compareTo(as) < 0, "El 3 debería ser menor que el As");
+        barajaService.repartirCartas(baraja, 52);
+        Carta siguiente = assertDoesNotThrow(() -> barajaService.repartirCarta(baraja));
+
+        assertNotNull(siguiente);
+        assertEquals(1, baraja.getIndice());
+    }
+
+    @Test
+    void barajarUnaBarajaConCartasRepartidas_shouldBeTrue() {
+        Baraja baraja = barajaService.crearBarajaCompleta();
+        barajaService.repartirCartas(baraja, 10);
+
+        barajaService.barajar(baraja);
+
+        assertEquals(0, baraja.getIndice());
+    }
+
+    @Test
+    void crearUnaCarta_shouldBeTrue() {
+        Carta as = new Carta("Picas", "A");
+        Carta rey = new Carta("Picas", "K");
+
+        assertEquals("Picas", as.getPalo());
+        assertEquals("A", as.getValor());
+        assertEquals(14, as.getValorNumerico());
+        assertEquals("A de Picas", as.toString());
+        assertTrue(as.compareTo(rey) > 0);
+    }
+
+    @Test
+    void recibirUnaCartaNula_shouldThrowException() {
+        poker.model.Jugador jugador = new poker.model.Jugador("Ana", 1000);
+
+        assertThrows(IllegalArgumentException.class, () -> jugador.recibirCarta(null));
     }
 }

@@ -62,7 +62,7 @@ src/main/java/poker/
 
 > 💡 **Requisitos:** Java 17 o superior.
    ```bash
-   java -jar poker-3.10.2.jar
+   java -jar poker-4.11.2.jar
    ```
 
 
@@ -72,7 +72,7 @@ Se necesita Java 17 o superior y Maven.
 
 ```bash
 mvn clean package
-java -jar target/poker-3.10.2.jar
+java -jar target/poker-4.11.2.jar
 ```
 
 La carpeta `target/` contiene los archivos generados por Maven, como las clases compiladas, los informes de tests y el archivo `.jar`. No contiene código fuente y puede regenerarse ejecutando la compilación.
