@@ -1,2 +1,6 @@
-poker\JugadoresActivosTest.class
+poker\ApuestaServiceTest.class
+poker\ConsolaViewTest.class
 poker\CartasTest.class
+poker\EvaluarManosTest.class
+poker\JuegoControllerTest.class
+poker\JugadoresTest.class
