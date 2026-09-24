@@ -106,3 +106,4 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 ## 💼 Uso comercial
 
 Este proyecto se distribuye bajo una licencia **No Comercial**. Si estás interesado en utilizar el código o una parte de él con fines comerciales, por favor contáctame al correo victorreguillo@gmail.com para obtener una licencia especial o permiso explícito.
+
