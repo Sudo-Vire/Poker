@@ -74,11 +74,22 @@ public class JuegoController {
     }
 
     private List<Jugador> crearJugadores() {
-        int numeroJugadores = view.leerNumero("¿Cuántos jugadores van a jugar? (2-10): ", 2, 10);
+        int jugadoresHumanos = view.leerNumero("¿Cuántos jugadores humanos van a jugar? (0-10): ", 0, 10);
+        Integer maquinasIntroducidas =
+                view.leerNumeroOpcional("¿Cuántas máquinas van a jugar? (0-10): ", 0, 10);
+        int maquinas = maquinasIntroducidas == null ? 0 : maquinasIntroducidas;
+        while (jugadoresHumanos + maquinas < 2 || jugadoresHumanos + maquinas > 10) {
+            view.mostrarMensaje("La mesa debe tener entre 2 y 10 jugadores en total.");
+            jugadoresHumanos = view.leerNumero("¿Cuántos jugadores humanos van a jugar? (0-10): ", 0, 10);
+            maquinas = view.leerNumero("¿Cuántas máquinas van a jugar? (0-10): ", 0, 10);
+        }
         List<Jugador> jugadores = new ArrayList<>();
-        for (int i = 0; i < numeroJugadores; i++) {
+        for (int i = 0; i < jugadoresHumanos; i++) {
             view.mostrarMensaje("Jugador " + (i + 1) + ", introduce tu nombre");
             jugadores.add(new Jugador(view.leerLinea(), SALDO_INICIAL));
+        }
+        for (int i = 0; i < maquinas; i++) {
+            jugadores.add(new Jugador("Máquina " + (i + 1), SALDO_INICIAL, true));
         }
         return jugadores;
     }
@@ -143,7 +154,7 @@ public class JuegoController {
             mostrarCartasComunitarias(comunitarias, "River");
         }
 
-        mostrarShowdown(comunitarias);
+        mostrarShowdown(jugadores, comunitarias);
         mostrarResumenManoFinal(jugadores);
         apuestaService.aumentarCiegas();
     }
@@ -173,9 +184,26 @@ public class JuegoController {
         view.mostrarMensaje(mensaje.toString());
     }
 
-    private void mostrarShowdown(List<Carta> comunitarias) {
+    private void mostrarShowdown(List<Jugador> jugadores, List<Carta> comunitarias) {
         Map<Jugador, Integer> ganancias = new HashMap<>();
         Map<Jugador, EvaluarManos.ResultadoEvaluacion> evaluacionesPorJugador = new HashMap<>();
+        for (Jugador jugador : jugadores) {
+            if (jugador.esMaquina()) {
+                EvaluarManos.ResultadoEvaluacion evaluacion =
+                        EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias);
+                evaluacionesPorJugador.put(jugador, evaluacion);
+                if (jugador.isEnJuego()) {
+                    view.mostrarMensaje(jugador.getNombre() + " muestra sus cartas: "
+                            + jugador.getMano());
+                    view.mostrarMensaje(jugador.getNombre() + " juega " + evaluacion.nombreJugada);
+                    view.mostrarMensaje("Cartas usadas: " + evaluacion.cartasPrincipales);
+                } else {
+                    view.mostrarMensaje(jugador.getNombre() + " se ha retirado con "
+                            + evaluacion.nombreJugada);
+                    view.mostrarMensaje("Cartas usadas: " + evaluacion.cartasPrincipales);
+                }
+            }
+        }
         for (ApuestaService.SidePot pot : apuestaService.getPots()) {
             List<Jugador> candidatos = pot.getParticipantes().stream()
                     .filter(Jugador::isEnJuego)
@@ -190,7 +218,7 @@ public class JuegoController {
                 EvaluarManos.ResultadoEvaluacion evaluacion = evaluacionesPorJugador.computeIfAbsent(
                         candidato, jugador -> EvaluarManos.evaluarManoCompleta(jugador.getMano(), comunitarias));
                 evaluaciones.add(evaluacion);
-                if (primeraEvaluacion) {
+                if (primeraEvaluacion && !candidato.esMaquina()) {
                     view.mostrarMensaje(candidato.getNombre() + " juega " + evaluacion.nombreJugada);
                     view.mostrarMensaje("Cartas usadas: " + evaluacion.cartasPrincipales);
                 }

@@ -9,6 +9,7 @@ Está desarrollada en Java con una estructura modular basada en MVC y aplica pri
 ## 🎯 Características
 
 - Partidas de Texas Hold'em para 2 a 10 jugadores.
+- Jugadores humanos y máquinas controladas por un bot de póker.
 - Baraja estándar de 52 cartas barajada automáticamente.
 - Reparto de cartas privadas, flop, turn y river.
 - Acciones de pasar, igualar, apostar, subir, all-in y retirarse.
@@ -24,6 +25,7 @@ La aplicación comienza en `poker.Juego`, que configura las dependencias e inici
 ```text
 src/main/java/poker/
 ├── Juego.java
+├── PokerBot.java
 ├── controller/
 │   └── JuegoController.java
 ├── model/
@@ -79,11 +81,12 @@ La carpeta `target/` contiene los archivos generados por Maven, como las clases 
 
 ## 🎮 Flujo de juego
 
-1. Introduce el número de jugadores y sus nombres.
-2. En cada turno, selecciona la acción escribiendo el número o el nombre de la opción.
-3. Las cartas comunitarias se muestran durante el flop, turn y river.
-4. La mano termina en el showdown o cuando todos los jugadores salvo uno se retiran.
-5. Los jugadores sin saldo son eliminados y la partida continúa hasta que queda un ganador.
+1. Introduce el número de jugadores humanos y de máquinas (entre 2 y 10 en total).
+2. Introduce los nombres de los jugadores humanos; las máquinas reciben un nombre automáticamente.
+3. En cada turno humano, selecciona la acción escribiendo el número o el nombre de la opción.
+4. Las cartas comunitarias se muestran durante el flop, turn y river.
+5. La mano termina en el showdown o cuando todos los jugadores salvo uno se retiran.
+6. Los jugadores sin saldo son eliminados y la partida continúa hasta que queda un ganador.
 
 ---
 
@@ -106,4 +109,3 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 ## 💼 Uso comercial
 
 Este proyecto se distribuye bajo una licencia **No Comercial**. Si estás interesado en utilizar el código o una parte de él con fines comerciales, por favor contáctame al correo victorreguillo@gmail.com para obtener una licencia especial o permiso explícito.
-

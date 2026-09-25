@@ -1,7 +1,13 @@
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\Apuesta.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\Baraja.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\CompararManos.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\EvaluarManos.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\Interfaz.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\Jugador.java
-C:\Users\Vire\IntelliJ proyects\Poker\src\main\java\poker\Poker.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\constants\ValorCartaConstants.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\controller\JuegoController.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\Juego.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\model\Baraja.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\model\Carta.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\model\Jugador.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\PokerBot.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\service\ApuestaService.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\service\BarajaService.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\service\CompararManos.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\service\EvaluarManos.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\service\JugadorService.java
+C:\Users\victo\JavaProjects\Poker\src\main\java\poker\view\ConsolaView.java
