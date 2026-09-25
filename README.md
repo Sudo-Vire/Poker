@@ -100,8 +100,8 @@ Este proyecto está licenciado bajo la licencia Creative Commons Attribution-Non
 ¡Las contribuciones son bienvenidas! Si deseas mejorar el proyecto, puedes:
 
 - Hacer un *fork* del repositorio.
-- Crear una nueva rama (`git checkout -b feature-nueva`).
-- Realizar tus cambios y hacer *commit* (`git commit -m 'Agrega nueva funcionalidad'`).
+- Crear una nueva rama (`git checkout -b feature-PR-(descripción)`).
+- Realizar tus cambios y hacer *commit* (`git commit -m '(Descripcion de la mejora)'`).
 - Enviar un *pull request* explicando tus mejoras.
 
 ---
